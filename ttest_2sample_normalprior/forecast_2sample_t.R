@@ -1,0 +1,66 @@
+# Continuous BFDA for 2-sample t-test with normal prior: Combined BF distribution
+
+source("posterior_2sample_t.R")
+source("bf_2sample_t.R")
+
+BF.forecast.MA <- function(group1_s1, group2_s1, group.n_s2, forecastmodel = "combined", alternative = "two.sided", prior.mu = 0, prior.var = 1, iter = 1000){
+  
+  # Which BF to compute?
+  BF <- switch(alternative,
+               "two.sided" = BF10_norm,
+               "greater" = BFplus0_norm,
+               "smaller" = BFmin0_norm)
+  
+  # t value stage 1
+  tval1 <- unname(t.test(group1_s1, group2_s1, var.equal = TRUE)$statistic)
+  
+  # Bayes factor stage 1
+  n1_s1 <- length(group1_s1)
+  n2_s1 <- length(group2_s1)
+  BF1 <- BF(tval = tval1, n1=n1_s1, n2 = n2_s1, prior.mu=prior.mu, prior.var=prior.var)
+  
+  # Posterior model probability H1 (used to calculate number of samples)
+  prob.H1 <- switch(forecastmodel,
+                    "combined" = BF1 / (BF1 + 1),
+                    "H0" = 0,
+                    "H1" = 1)
+  
+  # Draw effect size from posterior distribution
+  deltas1 <- sample_posterior(n.sample = round(prob.H1 * iter), tval = tval1, n1 = n1_s1, n2 = n2_s1, prior.mu = prior.mu, prior.var = prior.var, alternative = alternative)
+  deltas0 <- rep(0, iter-round(prob.H1 * iter))
+  deltas <- c(deltas1, deltas0)
+  
+  # Generate new standardized data from posterior
+  newdat <- array(rnorm(group.n_s2*2*iter), dim=c(group.n_s2, 2, iter))
+  newdat[, 2, ] <- newdat[, 2, ] - matrix(deltas, nrow=group.n_s2, ncol=iter, byrow=TRUE)
+  
+  # Bring data to scale of stage 1 data
+  s.pool_s1 <- (n1_s1*sd(group1_s1) + n2_s1*sd(group2_s1))/(n1_s1 + n2_s1)
+  newdat <- newdat * s.pool_s1 + mean(group1_s1)
+  
+  # Combine new data with stage 1 data
+  combidat <- array(NA, dim = c(group.n_s2+max(n1_s1, n2_s1), 2, iter))
+  combidat[1:n1_s1, 1, ] <- group1_s1
+  combidat[1:n2_s1, 2, ] <- group2_s1
+  combidat[(max(n1_s1, n2_s1)+1):(group.n_s2+max(n1_s1, n2_s1)), , ] <- newdat
+  
+  # Obtain combined t-values
+  tvalall <- apply(combidat, 3, function(x) t.test(x[,1], x[,2], var.equal = TRUE)$statistic)
+  
+  # Obtain BF distribution 
+  BFall <- BF(tvalall, n1 = n1_s1 + group.n_s2, n2 = n1_s1 + group.n_s2, prior.mu = prior.mu, prior.var = prior.var)
+  
+  # Return all results
+  return(list(BF_stage_1 = BF1,
+              BFdist_stage_2 = BFall,
+              ES = deltas))
+}
+
+# g1 <- rnorm(100)
+# g2 <- rnorm(100)-0.3
+# myforecast <- BF.forecast.MA(g1, g2, 200, forecastmodel = "H1", alternative="two.sided", prior.mu = 0, prior.var = 1)
+# 
+# myforecast$BF_stage_1
+# hist(myforecast$ES)
+# #table(myforecast$ES)
+# hist(log(myforecast$BFdist_stage_2))

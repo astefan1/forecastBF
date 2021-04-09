@@ -1,0 +1,435 @@
+---
+title: "Jeffreys Bayes Factor Approximation"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+## The approximation
+
+Jeffreys (1961), p. 246 ff.:
+
+> Our problem is to compare a specially suggested value of a new parameter, often 0, with the aggregate of other possible values. We do this by enunciating the hypothesis *q* that the parameter has the suggested value, and *q'*, that it has some other value to be determined from the observations. We shall call *q* the null hypothesis, following Fisher, and *q'* the alternative hypothesis. To say that we have no information initially as to whether the new parameter is needed or not we must take
+
+
+$$
+P(q \mid H) = P(q' \mid H) = \frac{1}{2}
+$$
+
+> But *q'* involves an adjustable parameter, $\alpha$ say, and
+
+$$
+P(q' \mid H) = \sum P(q', \alpha \mid H)
+$$
+
+> over all possible values of $\alpha$. We take $\alpha$ to be zero on *q*. [...] If the maximum likelihood solution for $\alpha$ is $a \pm s$, the chance of finding $a$ in a particular range, given *q* is nearly
+
+$$
+P(da \mid qH) = \frac{1}{\sqrt{(2\pi)}s} exp(-\frac{a^2}{2s^2}) da
+$$
+
+> and the chance, given *q'* and a particular value of $\alpha$, is
+
+$$
+P(da \mid q' \alpha H) = \frac{1}{\sqrt{(2\pi)}s} f(\alpha) exp(-\frac{(a-\alpha)^2}{2s^2}) d\alpha
+$$
+
+>Hence, by the principle of inverse probability
+
+$$
+P(q \mid aH) \propto \frac{1}{\sqrt{(2\pi)}s} exp(-\frac{a^2}{2s^2}),  \\
+P(q' d\alpha \mid aH) \propto \frac{1}{\sqrt{(2\pi)}s} f(\alpha) exp(-\frac{(a-\alpha)^2}{2s^2}) d\alpha
+$$
+
+> We shall in general write
+
+$$
+K = \frac{P(q \mid \theta H)}{P(q' \mid \theta H)}/\frac{P(q \mid H)}{P(q' \mid  H)}
+$$
+
+Note: The second term (divisor) can be canceled because it is equal to one if the prior probabilities are equal to one.
+
+> [...] If the number of observations, *n*, is large, *s* is usually small like $n^{-1/2}$. Then, if $a = 0$ and *n* large, *K* will be large of order $n^{1/2}$, since *f(a)* is independent of *n*. Then the observations support *q*, that is, they say that the new parameter is probably not needed. But if $|a|$ is much larger than *s* the exponential will be small, and the observations will support the need for the new parameter.
+
+In other papers (1977, 1980) Jeffreys therefore expresses *K* as
+
+$$
+K = \frac{P(q\mid \theta H)}{P(q' \mid \theta H)}= An^{1/2}exp\{-\frac{(a-\alpha_0)^2}{2s^2_a}\}, 
+$$
+
+where A is a constant.
+
+## Try it in R
+
+The exponential can be defined based on a t-value:
+
+$$
+t = \frac{a-\alpha_0}{s}
+$$
+
+```{r}
+# Approximate BF10 is 1/K
+BFapprox <- function(tval, n){
+  1/(sqrt(n)*exp(-0.5*tval^2))
+}
+
+# Compare to BayesFactor
+library(BayesFactor)
+ttest.tstat(t = 1.5, n1 = 50, simple=T)
+BFapprox(tval=1.5, n = 50)
+```
+
+```{r}
+tval <- seq(-5, 5, length.out=1001)
+Ns <- seq(10, 500, by=10)
+cond <- expand.grid(tval, Ns)
+
+cond$BFapprox <- apply(cond[, 1:2], 1, FUN = function(x) BFapprox(t=x[1], n=x[2]))
+cond$BFttest <- apply(cond[, 1:2], 1, FUN = function(x) unname(ttest.tstat(t=x[1], n1=x[2], simple=T)))
+
+colnames(cond)[1:2] <- c("tval", "N")
+```
+
+### Check Quality of Approximation with Graphs
+
+Colors:
+
+- Black: Jeffreys' approximation
+- Blue: Bayes factor
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+cond %>% filter(N %in% c(10, 50, 100, 500)) %>%
+  ggplot(aes(tval, log(BFapprox))) + 
+  geom_line() + 
+  facet_wrap(~ N) +
+  geom_line(aes(tval, log(BFttest)), color = "steelblue") +
+  labs(y = "log BF", x = "t-value")
+
+cond %>% filter(tval %in% c(-5:5)) %>%
+  ggplot(aes(N, log(BFapprox))) +
+  geom_line() +
+  facet_wrap(~ tval) + 
+  geom_line(aes(N, log(BFttest)), color="steelblue") +
+  labs(y = "log BF", x = "Sample size")
+```
+__Observations__
+
+- Approximation is worse for large t-values
+- Approximation is worse for small sample sizes
+- For small sample sizes curvature of BF ~ sample size is reversed
+
+### Approximation Quality with Different Priors
+
+Colors:
+
+- Black: Approximation
+- Green: Bayes factor (Darker colors used for wider priors. rscale: medium - wide - ultrawide according to *BayesFactor* package) 
+
+```{r}
+cond$BFwide <- apply(cond[, 1:2], 1, FUN = function(x) unname(ttest.tstat(t=x[1], n1=x[2], simple=T, rscale = "wide")))
+cond$BFultrawide <- apply(cond[, 1:2], 1, FUN = function(x) unname(ttest.tstat(t=x[1], n1=x[2], simple=T, rscale = "ultrawide")))
+```
+
+
+```{r}
+cond %>% filter(N %in% c(10, 50, 100, 500)) %>%
+  ggplot(aes(tval, log(BFapprox))) + 
+  geom_line() + 
+  facet_wrap(~ N) +
+  geom_line(aes(tval, log(BFttest)), color = "seagreen1") +
+  geom_line(aes(tval, log(BFwide)), color = "seagreen3") +
+  geom_line(aes(tval, log(BFultrawide)), color="seagreen") +
+  labs(y = "log BF", x = "t-value")
+```
+
+__Observations__
+
+- Same pattern as before
+- Differences between priors are most relevant for small t-values, differences BF vs. approximation are clearest for large t-values
+
+```{r}
+library(BFDA)
+cond$BFinf1 <- apply(cond[, 1:2], 1, FUN = function(x) BFDA:::bf10_normal(t=x[1], n1=x[2], independentSamples=F, prior.mean=0.5, prior.variance=0.3)$BF10)
+cond$BFinf2 <- apply(cond[, 1:2], 1, FUN = function(x) BFDA:::bf10_normal(t=x[1], n1=x[2], independentSamples=F, prior.mean=0.5, prior.variance=0.1)$BF10)
+```
+
+Graph: Darker color used for wider prior
+
+```{r}
+cond %>% filter(N %in% c(10, 20, 30, 50, 100, 500)) %>%
+  ggplot(aes(tval, log(BFapprox))) + 
+  geom_line() + 
+  facet_wrap(~ N) +
+  geom_line(aes(tval, log(BFinf1)), color = "seagreen") +
+  geom_line(aes(tval, log(BFinf2)), color = "seagreen1") +
+  labs(y = "log BF", x = "t-value")
+```
+
+__Observations__
+
+- With informed priors, the approximation breaks - especially for small sample sizes
+- Evidence is no longer symmetric
+- It looks like there is no easy way to make the approximation more accurate (e.g., change constant *A*), at least for small sample sizes
+
+### Improve Approximation Quality for Default Prior
+
+Graph: Gray line = approximate BF for A = 1, black line = approximate BF for optimized A, green line = default BF
+
+```{r}
+BFapproxA <- function(A, tval, n){
+  1/(A*sqrt(n)*exp(-0.5*tval^2))
+}
+
+objFun <- function(A, tval, n, BFs){
+  sum((log(BFapproxA(A, tval, n)) - log(BFs))^2)
+}
+
+As <- rep(NA, length(Ns))
+
+for(i in 1:length(Ns)){
+  As[i] <- optimize(function(x) objFun(x, tval=tval, n=Ns[i], BFs = cond$BFttest[cond$N == Ns[i]]),
+               interval=c(-10, 10))$minimum
+}
+
+cond$As <- rep(As, each=1001)
+cond$BFapproxOpt <- apply(cond[c(1,2,9)], 1, function(x) BFapproxA(A=x[3], tval=x[1], n=x[2]))
+
+cond %>% filter(N %in% c(10, 50, 100, 200, 300, 500)) %>%
+  ggplot(aes(tval, log(BFapproxOpt))) + 
+  geom_line() + 
+  facet_wrap(~ N) +
+  geom_line(aes(tval, log(BFttest)), color = "seagreen") +
+  geom_line(aes(tval, log(BFapprox)), color = "gray") +
+  labs(y = "log BF", x = "t-value")
+```
+
+```{r}
+cond %>%
+  ggplot(aes(N, As)) +
+  geom_line() +
+  labs(y = "N", x = "A")
+
+```
+
+__Observations:__
+
+- If we simply adjust the constant *A* as Jeffreys suggested, the Bayes factor gets "corrected" towards extreme values of *t*, i.e., the approximation gets slightly better in the tails, but (a lot) worse for small *t*-values.
+- Since the approximation already worked well for large sample sizes, *A* is close to 1 for large sample sizes
+
+
+### Polynomial Approximation
+
+For any sample size, the relationship between t-values and log Bayes factors can be described by a parabola shape. This can be approximated using a second-degree polynomial of the form $BF_{10}(t) \approx \beta_0 + \beta_1 t^2$.
+
+```{r}
+fitfun <- function(tval, n, BFs){
+  logBFs <- log(BFs)
+  lm(logBFs ~ I(tval^2))
+}
+
+cond2 <- cond
+
+for(i in Ns){
+  fit <- fitfun(tval=tval, n=i, BFs = cond$BFttest[cond$N == i])
+  cond2$BFapprox[cond2$N == i] <- exp(unlist(predict(fit)))
+}
+
+cond2 %>% filter(N %in% c(10, 50, 100, 500)) %>%
+  ggplot(aes(tval, log(BFapprox))) + 
+  geom_line() + 
+  facet_wrap(~ N) +
+  geom_line(aes(tval, log(BFttest)), color = "seagreen") +
+  labs(y = "log BF", x = "t-value")
+
+
+```
+
+__Observations:__
+
+- We can obtain reasonably good approximations with a 2nd degree polynomial
+- The polynomial approximations also get better with increasing sample size
+- They are better for small sample sizes (and extreme t-values) than Jeffreys' approximation
+
+Below, plots of the coefficients:
+
+```{r}
+coefs <- matrix(ncol=2)
+for(i in Ns){
+  fit <- fitfun(tval=tval, n=i, BFs = cond$BFttest[cond$N == i])
+  coefs <- rbind(coefs, fit$coefficients)
+}
+coefData <- as.data.frame(coefs[-1,])
+coefData$N <- Ns
+
+coefData %>%
+  ggplot(aes(N, `(Intercept)`)) +
+  geom_point() +
+  labs(y = "Intercept (beta_0)")
+
+coefData %>%
+  ggplot(aes(N, `I(tval^2)`)) +
+  geom_point() +
+  labs(y = "Beta weight for squared t-value (beta_1)")
+```
+
+__Observations:__
+
+- Clearly, the coefficients depend on the sample size
+- The relationship between sample size and the coefficients of the approximating function also looks very systematic
+
+### Using Approximations for BFDA
+
+Idea of this section: Conduct a BFDA for a t-test with a default prior with the BayesFactor package or the Bayes factor approximation methods. Check which methods is fastest and (for the approximations) yields results that are most comparable to the "true" BFDA results.
+
+
+```{r}
+delta <- 0.5
+N <- 50
+
+BFapproxJef <- function(tval, n){
+  1/(sqrt(n)*exp(-0.5*tval^2))
+}
+
+## Generate data (t-values) based on effect size
+tval <- NA
+for(i in 1:10000){
+  x <- rnorm(N, delta, sd=1)
+  tval[i] <- t.test(x)$statistic
+}
+
+res <- as.data.frame(cbind(tval))
+
+# Calculate BFs using the BayesFactor package
+a <- Sys.time()
+res$logBF <- log(apply(res, 1, function(x) unname(ttest.tstat(x, n1 = N, rscale = "medium", simple=T))))
+print(Sys.time()-a) # this takes roughly 40-45 seconds
+
+# Calculate approximate BFs using Jeffreys's approximation
+a <- Sys.time()
+res$logBFapproxJeffreys <- log(BFapproxJef(res$tval, n = N))
+print(Sys.time()-a) # this takes roughly 0.01 seconds
+
+# Calculate approximate BFs using a polynomial approximation
+a <- Sys.time()
+trange <- range(tval) # Find a good BF value approximation function for the t-value range
+tfit <- seq(trange[1], trange[2], length.out = 50)
+BFs <- apply(cbind(tfit), 1, function(x) unname(ttest.tstat(x, n1=N, rscale="medium", simple=T)))
+fit <- fitfun(tfit, n=N, BFs=BFs)
+res$logBFapproxLin <- fit$coefficients[1] + fit$coefficients[2]*tval^2
+print(Sys.time() - a) # this takes roughly 0.25 seconds
+
+```
+
+__Log Bayes factor Distribution: Quantiles__
+
+```{r}
+summary(res$logBF)
+summary(res$logBFapproxJeffreys)
+summary(res$logBFapproxLin)
+```
+
+__Percentage of Bayes factors crossing thresholds__
+
+Lower thresholds
+```{r}
+thresholds <- log(c(1/30, 1/10, 1/6, 1/3))
+apply(cbind(thresholds), 1, function(x) sum(res$logBF<x)/nrow(res))
+apply(cbind(thresholds), 1, function(x) sum(res$logBFapproxJeffreys<x)/nrow(res))
+apply(cbind(thresholds), 1, function(x) sum(res$logBFapproxLin<x)/nrow(res))
+```
+
+Upper thresholds
+```{r}
+thresholds <- log(c(3, 6, 10, 30))
+apply(cbind(thresholds), 1, function(x) sum(res$logBF>x)/nrow(res))
+apply(cbind(thresholds), 1, function(x) sum(res$logBFapproxJeffreys>x)/nrow(res))
+apply(cbind(thresholds), 1, function(x) sum(res$logBFapproxLin>x)/nrow(res))
+
+```
+
+__Observations__
+
+- Approximations are far from perfect
+- Jeffreys approximation tends to overestimate evidence, polynomial approximation tends to underestimate
+- Approximation quality likely changes with sample size (as shown before) and effect size
+- Jeffreys approximation cannot adapt to different prior distributions, will therefore depend (slightly) on the prior used
+
+__Checking for more sample sizes and effect sizes__
+
+```{r}
+Ns <- c(10, 50, 100, 500)
+deltas <- c(0, 0.1, 0.3, 0.5, 0.8)
+priorwidth <- c(0.707, 1)
+
+conds <- expand.grid(Ns, deltas)
+tvals <- simplify2array(apply(conds, 1, function(x){
+  tval <- NA
+  for(i in 1:5000){
+    samp <- rnorm(x[1], x[2], sd=1)
+    tval[i] <- t.test(samp)$statistic
+  }
+  return(tval)
+  }))
+
+# BFs prior1
+# BFs prior2
+# BFs approx. Jeffreys
+# BFs approx. polynomial (prior1)
+# BFs approx. polynomial (prior2)
+
+res <- array(NA, dim=c(5000, (length(Ns)*length(deltas)), 5))
+
+logBFapproxLin <- function(tval, N, rscale){
+  # Find a good BF value approximation function for the t-value range
+  trange <- range(tval) 
+  tfit <- seq(trange[1], trange[2], length.out = 50)
+  BFs <- apply(cbind(tfit), 1, function(x) unname(ttest.tstat(x, n1=N, rscale=rscale, simple=T)))
+  # Apply approximation
+  fit <- fitfun(tfit, n=N, BFs=BFs)
+  fit$coefficients[1] + fit$coefficients[2]*tval^2
+}
+
+
+for(i in 1:(length(Ns)*length(deltas))){
+  res[, i, 1] <- log(apply(cbind(tvals[,i]), 1, function(x) unname(ttest.tstat(x, n1 = conds[i,1], rscale = "medium", simple=T))))
+  res[, i, 2] <- log(apply(cbind(tvals[,i]), 1, function(x) unname(ttest.tstat(x, n1 = conds[i,1], rscale = "wide", simple=T))))
+  res[, i, 3] <- log(BFapproxJef(tvals[,i], n = conds[i,1]))
+  res[, i, 4] <- logBFapproxLin(tvals[,i], N = conds[i, 1], rscale="medium")
+  res[, i, 5] <- logBFapproxLin(tvals[,i], N = conds[i, 1], rscale="wide")
+}
+```
+
+Colors: 
+
+- Dark green: r scale = 0.707 ("medium")
+- Light green: r scale = 1 ("wide")
+
+```{r}
+bxpdat <- list()
+par(mfrow=c(1,4), mar=c(5, 3, 4, 1))
+
+for(i in 1:(length(Ns)*length(deltas))){
+  bxpdat[[i]] <- as.data.frame(matrix(NA, nrow=5*5000, ncol=2, dimnames = list(NULL, c("method", "BF"))))
+  bxpdat[[i]]$method <- rep(1:5, each=5000)
+  for(j in 1:5){
+    bxpdat[[i]]$BF[ bxpdat[[i]]$method==j] <- res[, i, j]
+  }
+  boxplot(BF ~ method, bxpdat[[i]], main=paste0("N = ", conds[i, 1], ", ES = ", conds[i, 2]), col=c("seagreen", "seagreen1", "gray", "seagreen", "seagreen2"))
+  
+}
+
+
+
+```
+
+__Observations:__
+
+- Across all sample sizes and effect sizes, the parabola provides a better approximation to the Bayes factor distribution than Jeffreys' approximation
+- Jeffreys's approximation always provides an overestimmate
+- With different N's and effect sizes, it also becomes clear that Jeffreys's approximation suffers from not being able to adjust (properly) to the prior
+- The constant *A* could be used for further flexibility, but as I showed before, it does not improve the estimation for individual Bayes factors 
+
+
