@@ -1,0 +1,24 @@
+{
+    "id": "AFEA1976",
+    "path": "~/Documents/Projects/Continuous BFDA/forecastBF/ttest_2sample_normalprior/forecast_2sample_t.R",
+    "project_path": "ttest_2sample_normalprior/forecast_2sample_t.R",
+    "type": "r_source",
+    "hash": "4283523033",
+    "contents": "",
+    "dirty": false,
+    "created": 1617982877333.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "cursorPosition": "65,0",
+        "scrollLine": "43"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1618216304,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1618216304286,
+    "read_only": false,
+    "read_only_alternatives": []
+}

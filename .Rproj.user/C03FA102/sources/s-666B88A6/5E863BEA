@@ -1,0 +1,24 @@
+{
+    "id": "5E863BEA",
+    "path": "~/Documents/Projects/Continuous BFDA/forecastBF/ttest_2sample_normalprior/bf_2sample_t.R",
+    "project_path": "ttest_2sample_normalprior/bf_2sample_t.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1617982826871.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "cursorPosition": "2,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1617982855,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1617982855960,
+    "read_only": false,
+    "read_only_alternatives": []
+}
