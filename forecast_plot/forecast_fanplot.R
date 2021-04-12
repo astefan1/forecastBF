@@ -5,7 +5,7 @@ source("ttest_2sample_normalprior/forecast_2sample_t.R")
 
 g1 <- rnorm(100)
 g2 <- rnorm(100) - 0.3
-resultBFforecast <- BF.forecast(g1, g2, 70, forecastmodel = "H0", alternative="two.sided", prior.mu = 0, prior.var = 1)
+resultBFforecast <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="two.sided", prior.mu = 0, prior.var = 1)
 
 fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor="grey"){
   
