@@ -4,8 +4,8 @@
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
 
 g1 <- rnorm(100)
-g2 <- rnorm(100) - 0.3
-resultBFforecast <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="two.sided", prior.mu = 0, prior.var = 1)
+g2 <- rnorm(100) 
+resultBFforecast <- BF.forecast(g1, g2, 200, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1)
 
 fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor="grey"){
   
@@ -51,7 +51,7 @@ fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor="grey"){
   BFforecastDens <- ks::kde.boundary(log(resultBFforecast$BFdist_stage_2), 
                                      xmin = min(log(resultBFforecast$BFdist_stage_2), -0.3 * max(log(resultBFforecast$BFdist_stage_2))), 
                                      xmax = max(log(resultBFforecast$BFdist_stage_2), -0.3 * min(log(resultBFforecast$BFdist_stage_2))), 
-                                     h = hpi(x = log(resultBFforecast$BFdist_stage_2)) * 2)
+                                     h = ks::hpi(x = log(resultBFforecast$BFdist_stage_2)) * 2)
   scaleDens <- (pretty(c(0, n_total))[2] - pretty(c(0, n_total))[1]) * 0.5
   scaleY <- pretty(ylimvals)[2]-pretty(ylimvals)[1]
   abovethresh <- round(sum(resultBFforecast$BFdist_stage_2 >= thresholds[2]) / length(resultBFforecast$BFdist_stage_2) * 100, 1)
