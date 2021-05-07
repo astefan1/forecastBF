@@ -5,10 +5,11 @@
 # longer).
 
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
+source("ttest_2sample_normalprior/mcmc_2sample_t.R")
 # 
-g1 <- rnorm(20)
-g2 <- rnorm(20) - 0.1
-resultBFforecast <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1)
+# g1 <- rnorm(20)
+# g2 <- rnorm(20) - 0.1
+# resultBFforecast <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1)
 
 noisyfanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, stepsize = NULL, showdensity = TRUE){
   
@@ -153,4 +154,4 @@ noisyfanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL,
   
 }
 
-noisyfanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), stepsize = 10, showdensity = T)
+# noisyfanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), stepsize = 10, showdensity = T)
