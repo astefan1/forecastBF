@@ -92,9 +92,9 @@ BF.forecast<- function(group1_s1, group2_s1, group.n_s2, forecastmodel = "combin
                               prior.var = prior.var)))
 }
 
-g1 <- rnorm(100)
-g2 <- rnorm(100)-0.3
-myforecast <- BF.forecast(g1, g2, 200, forecastmodel = "combined", alternative="two.sided", prior.mu = 0, prior.var = 1)
+# g1 <- rnorm(100)
+# g2 <- rnorm(100)-0.3
+# myforecast <- BF.forecast(g1, g2, 200, forecastmodel = "combined", alternative="two.sided", prior.mu = 0, prior.var = 1)
 
 # myforecast$BF_stage_1
 # hist(myforecast$ES)

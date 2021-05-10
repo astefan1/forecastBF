@@ -97,7 +97,7 @@ fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, show
        ylab="",
        cex.lab = 1.5)
   axis(2, at=pretty(ylimvals), labels = format(exp(pretty(ylimvals)), digits=2, width=5), las = 1)
-  mtext("(Expected) Bayes factor", 2, line=5, cex=1.5)
+  mtext("(Projected) Bayes factor", 2, line=5, cex=1.5)
   segments(x0=nrow(dat_update)+1, x1 = n_total, y0 = log(resultBFforecast$BF_stage_1), y1 = log(resultBFforecast$BFdist_stage_2[1:nH1]), col = scales::alpha(fancolor[1], 0.3))
   segments(x0=nrow(dat_update)+1, x1 = n_total, y0 = log(resultBFforecast$BF_stage_1), y1 = log(resultBFforecast$BFdist_stage_2[(nH1+1):length(resultBFforecast$BFdist_stage_2)]), col = scales::alpha(fancolor[2], 0.3))
   if(showdensity){
