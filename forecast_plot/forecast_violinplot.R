@@ -107,4 +107,4 @@ forecast_violinplot <- function(resultBFforecast, thresholds, distcolors=NULL){
   
 }
 
-# forecast_violinplot(resultBFforecast, thresholds = c(1/10, 10))
+forecast_violinplot(resultBFforecast, thresholds = c(1/10, 10))

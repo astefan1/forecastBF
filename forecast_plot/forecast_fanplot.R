@@ -5,10 +5,6 @@
 
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
 
-# g1 <- rnorm(100)
-# g2 <- rnorm(100) 
-# resultBFforecast <- BF.forecast(g1, g2, 20, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1)
-
 fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, showdensity=TRUE){
   
   # Choose Bayes factor that should be calculated
@@ -104,7 +100,7 @@ fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, show
     polygon(x = c(rep(n_total + 0.5*scaleDens, length(BFforecastDens$eval.points)), 
                   n_total + 0.5*scaleDens + rev(BFforecastDens$estimate/max(BFforecastDens$estimate) * scaleDens)), 
             y = c(BFforecastDens$eval.points, rev(BFforecastDens$eval.points)), 
-            xpd = NA, col = fancolor)
+            xpd = NA, col = "grey")
     text(x = xtext, y = log(thresholds[2]) + 0.5 * scaleY, label = paste(abovethresh, "%"), xpd=NA, adj = c(0,0))
     text(x = xtext, y = 0, label = paste(betweenthresh, "%"), xpd=NA, adj = c(0,0.5))
     text(x = xtext, y = log(thresholds[1]) - 0.5 * scaleY, label = paste(belowthresh, "%"), xpd=NA, adj = c(0,1))
@@ -113,5 +109,10 @@ fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, show
     segments(x0 = 0, y0 = log(thresholds), x1 = n_total + ifelse(showdensity, 2*scaleDens, 0), lty = "dashed", xpd = NA)
 }
 
-# fanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), showdensity = F)
+fanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), showdensity = T)
+
+g1 <- rnorm(50)
+g2 <- rnorm(50) - 0.35
+resultBFforecast <- BF.forecast(g1, g2, 70, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1, iter = 1000)
+
 

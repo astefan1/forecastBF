@@ -49,7 +49,7 @@ BF.forecast<- function(group1_s1, group2_s1, group.n_s2, forecastmodel = "combin
   if(1-prob.H1 > 0){
     param0 <- drawH0_2sample_t(iter-round(prob.H1 * iter), group1_s1, group2_s1)
   } else {
-    param0 <- NULL
+    param0 <- matrix(NA, ncol = 2, nrow=0)
   }
   
   allparam <- rbind(param1, cbind(param0, rep(0, iter-round(prob.H1 * iter))))

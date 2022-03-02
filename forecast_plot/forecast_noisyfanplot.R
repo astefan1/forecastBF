@@ -154,4 +154,4 @@ noisyfanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL,
   
 }
 
-# noisyfanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), stepsize = 10, showdensity = T)
+# noisyfanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), stepsize = 50, showdensity = T)
