@@ -1,6 +1,6 @@
 # BFDA for independent-samples t-test
 
-source("bf_2sample_t.R")
+source("ttest_2sample_normalprior/bf_2sample_t.R")
 
 BFDA_2sample_t <- function(pop.ES, alternative, group.n, prior.mu, prior.var, iter = 1000){
   
@@ -31,18 +31,18 @@ BFDA_2sample_t <- function(pop.ES, alternative, group.n, prior.mu, prior.var, it
 
 # Takes ~ 0.2 seconds
 # a <- Sys.time()
-# bfda1 <- BFDA_2sample_t(rnorm(1000), alternative="two.sided", group.n = 300, prior.mu = 0.5, prior.var = 1, iter = 1000)
+# bfda1 <- BFDA_2sample_t(0.5, alternative="greater", group.n = 30, prior.mu = 0, prior.var = 1, iter = 1000)
 # Sys.time() - a
 
 # Takes ~ 22 seconds
 # a <- Sys.time()  
 # bfda2 <- BFDA::BFDA.sim(expected.ES = 0.5,
 #                         type="t.between",
-#                         prior=list("normal", list(prior.mean = 0.5, prior.variance = 1)),
-#                         n.max = 300,
+#                         prior=list("normal", list(prior.mean = 0, prior.variance = 1)),
+#                         n.max = 100,
 #                         design = "fixed.n",
 #                         B = 1000,
-#                         alternative = "two.sided",
+#                         alternative = "greater",
 #                         verbose = FALSE,
 #                         seed = NULL)
 # Sys.time() - a
