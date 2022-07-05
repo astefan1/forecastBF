@@ -2,6 +2,8 @@
 # Evaluation of simulation results: Stopping for futility
 # ==============================================================================
 
+############################# Data wrangling ###################################
+
 rm(list = ls())
 
 # Extract simulation results from directory
@@ -39,7 +41,7 @@ for(i in 1:(length(SIM_names))){
   }
 }
 
-# Make plots
+####### Stacked barplot: Design Analysis (all population effect sizes) #########
 
 simresults_long <- data.frame(finalBF = unlist(simresults[, grep("finalBF", colnames(simresults))]),
                               finalN = unlist(simresults[, grep("finalN", colnames(simresults))]),
@@ -67,6 +69,8 @@ ggplot(simresults_long, aes(x = ES.pop, fill = reasonEnd)) +
   labs(x = "Population Effect Size",
        y = "% Ending At") +
   scale_y_continuous(breaks = seq(0, 1000, by = 250), labels = seq(0, 100, by = 25)) 
+
+############# Stacked barplots: Distribution of sample sizes ###################
 
 simresults[, grep("reasonEnd_", colnames(simresults))] <- lapply(simresults[, grep("reasonEnd_", colnames(simresults))],
                                                                  factor, levels = c("H0", "maxN", "futility", "H1"))
@@ -109,7 +113,7 @@ ggplot(simresults, aes(x = as.factor(finalN_05), fill = as.factor(reasonEnd_05))
        y = "% Ending At") +
   scale_y_continuous(limits = c(0, 280), breaks = seq(0, 250, by = 50), labels = seq(0, 25, by = 5)) 
 
-# Analyze bias
+##################### Bias in Futility Stopping ################################
 
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
 
@@ -123,14 +127,33 @@ for(i in 1:nrow(simresults_long)){ # figure out t-values that belong to BFs
                       interval = c(-10, 10))$minimum
 }
 
+simresults_long$tval <- tval
 
+simresults_long$dFinal <- simresults_long$tval*sqrt(2/simresults_long$finalN)
+simresults_long$SEDFinal <- sqrt((2*simresults_long$finalN)/(simresults_long$finalN^2) + (simresults_long$dFinal^2) / (4*simresults_long$finalN))
 
-BFplus0_norm(5.775551, n1=20, n2=20, prior.mu = 0, prior.var = 1)
-
-range(simresults_long$finalBF)
-simresults_long[which.max(simresults_long$finalBF),]
-
-
+ES.pop <- seq(0,1,by=0.1)
+ES.noBias <- rep(NA, length(ES.pop))
+ES.Bias <- rep(NA, length(ES.pop))
+for(i in 1:length(ES.pop)){
   
+  sim <- simresults_long[simresults_long$ES.pop == ES.pop[i],]
+  ES.noBias[i] <- coef(metafor::rma(yi = sim$dFinal, 
+                               sei = sim$SEDFinal, 
+                               method = "FE"))
+  ES.Bias[i] <- coef(metafor::rma(yi = sim[sim$reasonEnd %in% c("H0", "H1"),]$dFinal, 
+                             sei = sim[sim$reasonEnd %in% c("H0", "H1"),]$SEDFinal, 
+                             method = "FE"))
+  
+}
 
+# Plot estimates for reporting everything
+par(mar=c(5,5,2,2))
+plot(ES.pop, ES.noBias, pch = 19, bty="l", xlab = "Population Effect Size", 
+     ylab = "Meta-Analytic Estimate", cex.lab = 2, cex.axis = 1.5, cex=1.5, ylim = c(-0.2,1.1))
+
+abline(a=0, b=1, col = "grey")
+
+# Add estimates for selective reporting
+points(ES.pop, ES.Bias, pch = 19, bty="l", xlab = "Population Effect Size", ylab = "Meta-Analytic Estimate", cex.lab = 2, cex.axis = 1.5, cex=1.5, ylim = c(-0.2, 1), col = "red")
 

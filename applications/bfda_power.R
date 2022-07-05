@@ -1,3 +1,12 @@
+# ==============================================================================
+# Regular BFDA: Probability of obtaining strong evidence with specific (fixed)
+# sample sizes  -- Overview for coparison & explanation pilot study design
+# ==============================================================================
+
+rm(list = ls())
+
+############################ Conduct BFDAs #####################################
+
 source("ttest_2sample_normalprior/bfda_fixed_2sample_t.R")
 
 groupN <- seq(20, 200, by=10)
@@ -23,6 +32,8 @@ for(i in seq_along(groupN)){
 
 rownames(power) <- groupN
 colnames(power) <- ES
+
+################## Plots: Is power > 80% for a specific sample size ############
 
 library(reshape2)
 powerDat <- reshape2::melt(as.data.frame(power))

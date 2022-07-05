@@ -1,8 +1,10 @@
-# Plots for internal pilot study design: Conclusive evidence and sample size
-
-#### Model-averaged predictions, wide prior ####
+# ==============================================================================
+# Plots for internal pilot study design
+# ==============================================================================
 
 rm(list = ls())
+
+################## Model-averaged predictions, zero-centered prior #############
 
 source("applications/sim_pilot_Analyze.R")
 
@@ -53,7 +55,7 @@ ggplot(countsDF, aes(fill = SSconclusiveFinal, x = ES.pop, y = counts/10)) +
   scale_y_continuous(limits = c(-100, 100), labels = c("100", "50", "0", "50", "100"))
 
 
-#### Predictions under H1, wide prior ####
+################ Predictions under H1, zero-centered prior (Appendix) ##########
 
 rm(list = ls())
 
@@ -107,7 +109,7 @@ ggplot(countsDF, aes(fill = SSconclusiveFinal, x = ES.pop, y = counts/10)) +
        y = "% Ending At") +
   scale_y_continuous(limits = c(-100, 100), labels = c("100", "50", "0", "50", "100"))
 
-#### Model-averaged predictions, Vohs prior ####
+################# Model-averaged predictions, Vohs prior (Appendix) ############
 
 rm(list = ls())
 
@@ -160,7 +162,7 @@ ggplot(countsDF, aes(fill = SSconclusiveFinal, x = ES.pop, y = counts/10)) +
        y = "% Ending At") +
   scale_y_continuous(limits = c(-100, 100), labels = c("100", "50", "0", "50", "100")) 
 
-#### Predictions under H0, wide prior ####
+############### Predictions under H0, zero-centered prior (Appendix) ###########
 
 rm(list = ls())
 
@@ -213,9 +215,7 @@ ggplot(countsDF, aes(fill = SSconclusiveFinal, x = ES.pop, y = counts/10)) +
        y = "% Ending At") +
   scale_y_continuous(limits = c(-100, 100), labels = c("100", "50", "0", "50", "100")) 
 
-#### Predictions under H1, Vohs prior ####
-
-#### Model-averaged predictions, Vohs prior ####
+############## Model-averaged predictions, Vohs prior (Appendix) ###############
 
 rm(list = ls())
 
@@ -268,11 +268,7 @@ ggplot(countsDF, aes(fill = SSconclusiveFinal, x = ES.pop, y = counts/10)) +
        y = "% Ending At") +
   scale_y_continuous(limits = c(-100, 100), labels = c("100", "50", "0", "50", "100")) 
 
-
-
-
-
-# Plots for internal pilot study design: Meta-analytic Bias
+########### Plots for internal pilot study design: Meta-analytic Bias ##########
 
 #### Report everything ####
 

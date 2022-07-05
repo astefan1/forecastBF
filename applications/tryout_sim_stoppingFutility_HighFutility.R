@@ -1,3 +1,8 @@
+# ==============================================================================
+# What happens for a high(er) futility threshold? Exploratory analysis, not
+# reported in the paper, mostly conducted as a plausibility check
+# ==============================================================================
+
 SIM_stopfutil_HIGHFUTIL <- designAnalysis.stopfutil(n.min = 10, 
                                              n.max = 100, 
                                              stepsize = 10, 

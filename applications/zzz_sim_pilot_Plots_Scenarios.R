@@ -1,10 +1,12 @@
 # ==============================================================================
-# Pilot study scenarios illustration
+# Illustration of the different scenarios that can occur in the internal pilot 
+# study design. Deprecated (not included in the manuscript).
 # ==============================================================================
 
 load("SIM_pilot_05.RData")
 load("SIM_pilot_00.RData")
 source("applications/SIM_pilot_Analyze.R")
+
 simplefan_pilot <- function(SIM_pilot, ID = 1, n.main = 30){
   
   sim <- SIM_pilot[[1]][[ID]]

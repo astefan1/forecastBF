@@ -1,4 +1,17 @@
+# ==============================================================================
+# Functions to apply stopping rules post-hoc to simulation results in the 
+# internal pilot study design.
+# ==============================================================================
+
+rm(list = ls())
+
 source("applications/sim_pilot_Functions.R")
+
+# Function to automate checking if a value is above a certain threshold
+
+#'@param x The value to be compared
+#'@param boundary Specified value for the threshold
+#'@param which One out of "upper", "lower", or "both"
 
 checkThreshold <- function(x, boundary, which){
   switch(which,
@@ -7,15 +20,14 @@ checkThreshold <- function(x, boundary, which){
          both = x > boundary[2] | x < boundary[1])
 }
 
-# SIM_names <- dir(".", pattern = "SIM_pilot_")
-# lapply(SIM_names, load, .GlobalEnv)
+# Design analysis for pilot study design
 
-#' Design analysis for pilot study design
 #' @param simResult Result from sim.pilot()
 #' @param boundary Decision boundary: What is considered strong evidence? Provide vector of length 2
 #' @param power Envisioned probability of strong evidence (for H0 or H1)
 #' @param abandon What should happen if intermediate design analysis shows probability to reach strong evidence at n.max < power? abandon = TRUE = stop with n.pilot; abandon = FALSE = use largest SS
 #' @param nmin What should happen if BF at n.pilot is larger than boundary? If nmin < n.pilot, stop at n.pilot; else sample nmin
+#' @param whichThreshold What Bayes factor threshold should be chosen for the design analysis? Upper, lower, or both?
 
 analyzePilot <- function(simResult, boundary = c(1/10, 10), power = 0.8, abandon = TRUE, nmin = 0, whichThreshold = "both"){
   
@@ -73,6 +85,11 @@ analyzePilot <- function(simResult, boundary = c(1/10, 10), power = 0.8, abandon
   return(data.frame(maxPower, SSFinal, BFFinal, dFinal, SEDFinal))
   
 } 
+
+# Function to conduct a meta-analysis from simulation results stored used to
+# analyze bias
+
+#'@param resPilot Result from the analyzePilot() function
 
 metaPilot <- function(resPilot){
   

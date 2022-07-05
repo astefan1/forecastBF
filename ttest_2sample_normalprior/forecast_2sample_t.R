@@ -1,8 +1,20 @@
-# Continuous BFDA for 2-sample t-test with normal prior: Combined BF distribution
+# ==============================================================================
+# Bayes factor forecast for an independent samples t-test with normal prior
+# ==============================================================================
 
-# source("ttest_2sample_normalprior/posterior_2sample_t.R")
 source("ttest_2sample_normalprior/bf_2sample_t.R")
 source("ttest_2sample_normalprior/mcmc_2sample_t.R")
+
+# Function to compute the forecast
+#'@param group1_s1 Observed data group 1
+#'@param group2_s1 Observed data group 2
+#'@param group.n_s2 Number of planned observations (how many observations do you look into the future)
+#'@param forecastmodel Under which model should the forecast be computed? ("combined" = model-averaged, "H1" = alternative, "H0" = null)
+#'@param alternative Direction of alternative hypothesis ("two.sided", "greater", "less")
+#'@param prior.mu Mean of the prior distribution on delta
+#'@param prior.var Variance of the prior distribution on delta
+#'@param iter Number of Monte Carlo iterations for the forecast 
+#'@param mcmc.setting List determining the settings of the MCMC sampling of posterior under H1 ($chains = number of chains, $iter = number of iterations in the MCMC algorithm, $burnin = number of burn-in samples)
 
 BF.forecast<- function(group1_s1, group2_s1, group.n_s2, forecastmodel = "combined", alternative = "two.sided", prior.mu = 0, prior.var = 1, iter = 1000, mcmc.setting = list()){
   
@@ -92,11 +104,7 @@ BF.forecast<- function(group1_s1, group2_s1, group.n_s2, forecastmodel = "combin
                               prior.var = prior.var)))
 }
 
+# Example
 # g1 <- rnorm(100)
 # g2 <- rnorm(100)-0.3
 # myforecast <- BF.forecast(g1, g2, 200, forecastmodel = "combined", alternative="two.sided", prior.mu = 0, prior.var = 1)
-
-# myforecast$BF_stage_1
-# hist(myforecast$ES)
-# #table(myforecast$ES)
-# hist(log(myforecast$BFdist_stage_2))

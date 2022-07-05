@@ -1,6 +1,16 @@
-# BFDA for independent-samples t-test
+# ==============================================================================
+# Fast BFDA for independent-samples t-test (Fixed-N)
+# ==============================================================================
 
 source("ttest_2sample_normalprior/bf_2sample_t.R")
+
+# Function to compute the BFDA
+#'@param pop.ES Population effect size
+#'@param alternative Direction of alternative hypothesis ("two.sided", "greater", "less")
+#'@param group.n Sample size per group
+#'@param prior.mu Mean of the prior distribution on delta under H1
+#'@param prior.var Variance of the prior distribution on delta under H1
+#'@param iter Number of iterations in the Monte Carlo simulation
 
 BFDA_2sample_t <- function(pop.ES, alternative, group.n, prior.mu, prior.var, iter = 1000){
   
@@ -28,6 +38,7 @@ BFDA_2sample_t <- function(pop.ES, alternative, group.n, prior.mu, prior.var, it
   
 }
 
+# Comparison to BFDA package
 
 # Takes ~ 0.2 seconds
 # a <- Sys.time()

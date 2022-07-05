@@ -1,5 +1,14 @@
+# ==============================================================================
 # Functions to compute Bayes factors for independent-samples t-tests with 
 # normal priors
+# ==============================================================================
+
+# Function to compute the Bayes factor for a two-sided hypothesis
+#' @param tval t value calculated based on sample
+#' @param n1 Sample size group 1
+#' @param n2 Sample size group 2
+#' @param prior.mu Mean of the prior distribution on delta under H1
+#' @param prior.var Variance of the prior distribution on delta under H1
 
 BF10_norm <- function(tval, n1, n2, prior.mu=0, prior.var=1){
   
@@ -14,6 +23,13 @@ BF10_norm <- function(tval, n1, n2, prior.mu=0, prior.var=1){
   
   return(ml1/ml0)
 }
+
+# Function to compute the Bayes factor for a negative directional hypothesis
+#' @param tval t value calculated based on sample
+#' @param n1 Sample size group 1
+#' @param n2 Sample size group 2
+#' @param prior.mu Mean of the prior distribution on delta under H1
+#' @param prior.var Variance of the prior distribution on delta under H1
 
 BFmin0_norm <- function(tval, n1, n2, prior.mu=0, prior.var=1){
   
@@ -39,6 +55,13 @@ BFmin0_norm <- function(tval, n1, n2, prior.mu=0, prior.var=1){
 }
 
 BFmin0_norm <- Vectorize(BFmin0_norm, vectorize.args = "tval")
+
+# Function to compute the Bayes factor for a positive directional hypothesis
+#' @param tval t value calculated based on sample
+#' @param n1 Sample size group 1
+#' @param n2 Sample size group 2
+#' @param prior.mu Mean of the prior distribution on delta under H1
+#' @param prior.var Variance of the prior distribution on delta under H1
 
 BFplus0_norm <- function(tval, n1, n2, prior.mu=0, prior.var=1){
   
@@ -73,11 +96,6 @@ BFplus0_norm <- function(tval, n1, n2, prior.mu=0, prior.var=1){
 
 BFplus0_norm <- Vectorize(BFplus0_norm, vectorize.args = "tval")
 
+# Example
 
-# a <- Sys.time()
 # BFmin0_norm(seq(-1, 1, length.out = 1000), 30, 30, prior.mu=0.5, prior.var=2)
-# Sys.time()-a
-# 
-# a <- Sys.time()
-# bf10_normal(1, n1=30, n2=30, independentSamples = TRUE, prior.mean=0.5, prior.variance=2)$BFmin0
-# Sys.time()-a

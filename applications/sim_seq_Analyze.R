@@ -1,6 +1,9 @@
 # ==============================================================================
-# Evaluation of simulation results: sequential design with maxN
+# Evaluation of simulation results: sequential design with maxN (no futility 
+# stopping)
 # ==============================================================================
+
+############################# Data wrangling ###################################
 
 # Extract simulation results from directory
 SIM_names <- dir(".", pattern = "SIM_seqMaxN_")
@@ -47,6 +50,8 @@ simresults_long$design <- "seq"
 
 SIM_seqMaxN_summary <- simresults_long
 save(SIM_seqMaxN_summary, file = "SIM_summary_seqMaxN.RData")
+
+####### Stacked barplot: Design Analysis (all population effect sizes) #########
 
 library(ggplot2)
 

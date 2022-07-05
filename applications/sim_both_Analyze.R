@@ -2,6 +2,10 @@
 # Evaluation of simulation results: Comparing futility stopping to simple maxN
 # ==============================================================================
 
+rm(list = ls())
+
+############################# Data wrangling ###################################
+
 load("SIM_summary_seqMaxN.RData")
 load("SIM_summary_stopfutil.RData")
 
@@ -13,7 +17,7 @@ meanN <- as.data.frame(tapply(SIM_summary$finalN, SIM_summary[, c("ES.pop", "des
 meanN$ES.pop <- unique(SIM_summary$ES.pop)
 meanN_long <- reshape2::melt(data = meanN, id.vars = "ES.pop", measure.vars = c("futil", "seq"))
 
-# Plot
+############### Plot: Comparison mean sample sizes #############################
 
 library(ggplot2)
 

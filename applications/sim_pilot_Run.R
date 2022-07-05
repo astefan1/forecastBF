@@ -1,6 +1,14 @@
-# Design analysis of the pilot study design with different effect sizes
+# ==============================================================================
+# Script to conduct design analyses for the internal pilot study application
+# ==============================================================================
+
+# Simulations need several hours to run. Results can be found on https://osf.io/xaqh4/
+# To run the analysis script (sim_stoppingFutility_Analyze.R), results need to
+# be saved in the R-project folder.
 
 source("applications/sim_pilot_Functions.R")
+
+############# Model-averaged predictions, zero-centered prior ##################
 
 SIM_pilot_00 <- designAnalysis.pilot(n.pilot = 20, 
                                      n.main = c(30, 80, 130, 180), 
@@ -121,7 +129,9 @@ SIM_pilot_10 <- designAnalysis.pilot(n.pilot = 20,
                                      iter = 1000, 
                                      iter.DA = 1000,
                                      mcmc.setting = list(chains=2, burnin=0, iter=5000))
-save(SIM_pilot_10, file="SIM_pilot_10.RData")                          
+save(SIM_pilot_10, file="SIM_pilot_10.RData")   
+
+################# Predictions under H1, zero-centered prior ####################
 
 SIM_pilotH1_00 <- designAnalysis.pilot(n.pilot = 20,
                                        n.main = c(30, 80, 130, 180), 
@@ -264,7 +274,9 @@ SIM_pilotH1_10 <- designAnalysis.pilot(n.pilot = 20,
                                        forecastmodel = "H1",
                                        mcmc.setting = list(chains=2, burnin=0, iter=5000))
 
-save(SIM_pilotH1_10, file="SIM_pilotH1_10.RData")                          
+save(SIM_pilotH1_10, file="SIM_pilotH1_10.RData") 
+
+############# Model-averaged predictions, informed prior #######################
 
 SIM_pilotInformed_00 <- designAnalysis.pilot(n.pilot = 20,
                                              n.main = c(30, 80, 130, 180), 
@@ -396,7 +408,9 @@ SIM_pilotInformed_10 <- designAnalysis.pilot(n.pilot = 20,
                                              iter.DA = 1000,
                                              mcmc.setting = list(chains=2, burnin=0, iter=5000))
 
-save(SIM_pilotInformed_10, file="SIM_pilotInformed_10.RData")                          
+save(SIM_pilotInformed_10, file="SIM_pilotInformed_10.RData")
+
+################# Predictions under H0, zero-centered prior ####################
 
 SIM_pilotH0_00 <- designAnalysis.pilot(n.pilot = 20,
                                        n.main = c(30, 80, 130, 180), 
@@ -540,6 +554,8 @@ SIM_pilotH0_10 <- designAnalysis.pilot(n.pilot = 20,
                                        mcmc.setting = list(chains=2, burnin=0, iter=5000))
 
 save(SIM_pilotH0_10, file="SIM_pilotH0_10.RData")   
+
+################# Predictions under H1, informed prior #########################
 
 SIM_pilotInformedH1_00 <- designAnalysis.pilot(n.pilot = 20,
                                              n.main = c(30, 80, 130, 180), 

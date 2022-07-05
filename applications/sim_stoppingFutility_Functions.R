@@ -4,7 +4,18 @@
 
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
 
-# Function to simulate stopping for futility
+# Function to simulate a stopping for futility scenario (data, design)
+#' @param n.min Minimum sample size
+#' @param n.max Maximum sample size
+#' @param stepsize After how many observations will the design be evaluated
+#' @param ES.pop Population effect size
+#' @param futilitythreshold Threshold for futility stopping
+#' @param boundary Vector providing lower and upper limit for stopping for strong evidence
+#' @param alternative Direction of alternative hypothesis ("two-sided", "greater", "less")
+#' @param prior.mu Mean of the prior distribution on delta
+#' @param prior.var Variance of the prior distribution on delta
+#' @param iter Number of Monte Carlo iterations for the forecast 
+#' @param mcmc.setting List determining the settings of the MCMC sampling of posterior under H1 ($chains = number of chains, $iter = number of iterations in the MCMC algorithm, $burnin = number of burn-in samples)
 
 sim.stopfutil <- function(n.min, n.max, stepsize, ES.pop, futilitythreshold = 0.01, boundary=c(1/10, 10), alternative="two.sided", prior.mu=0, prior.var=1, iter = 1000, mcmc.setting = list(chains=2, burnin=0, iter=5000)){
   
@@ -60,6 +71,22 @@ sim.stopfutil <- function(n.min, n.max, stepsize, ES.pop, futilitythreshold = 0.
   
   return(stopfutil)
 }
+
+# Compute a design analysis for the stopping for futility application example,
+# i.e., re-run the simulation many times
+
+#' @param n.min Minimum sample size
+#' @param n.max Maximum sample size
+#' @param stepsize After how many observations will the design be evaluated
+#' @param ES.pop Population effect size
+#' @param futilitythreshold Threshold for futility stopping
+#' @param boundary Vector providing lower and upper limit for stopping for strong evidence
+#' @param alternative Direction of alternative hypothesis ("two-sided", "greater", "less")
+#' @param prior.mu Mean of the prior distribution on delta
+#' @param prior.var Variance of the prior distribution on delta
+#' @param iter.DA Number of Monte Carlo iterations for the design analysis
+#' @param iter.forecast Number of Monte Carlo iterations for each forecast
+#' @param mcmc.setting List determining the settings of the MCMC sampling of posterior under H1 ($chains = number of chains, $iter = number of iterations in the MCMC algorithm, $burnin = number of burn-in samples)
 
 designAnalysis.stopfutil <- function(n.min, n.max, stepsize, ES.pop, futilitythreshold = 0.01, boundary=c(1/10, 10), alternative="two.sided", prior.mu=0, prior.var=1, iter.forecast = 1000, iter.DA = 1000, mcmc.setting = list(chains=2, burnin=0, iter=5000)){
   

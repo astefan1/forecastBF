@@ -1,19 +1,25 @@
 # ==============================================================================
 # Functions to sample from the joint posterior distribution 
-# p(mu, sigma, delta | y) under H1 and p(mu, sigma | y) under H0. For H1, we
+# p(mu, sigma, delta | y) under H1 and p(mu, sigma | y) under H0 for an 
+# independent-samples t-test with a normal prior on delta. For H1, we
 # use MCMC sampling. For H0, we sample sigma from the marginal distribution, 
 # then mu from the conditional distribution.
 # ==============================================================================
 
 ########################### H1 sampling ########################################
 
-# mydata <- c(n1, n2, m1, m2, v1, v2)
-# param <- c(mu, sigma, delta)
-# priorpar <- c(prior.mu, prior.var)
+# Draw samples from the joint posterior distribution for delta and sigma (and mu)
+# in the independent-samples t-test
+#'@param mydata Vector describing the data consisting of 6 elements: Sample size group 1 and 2, means group 1 and 2, variances group 1 and 2
+#'@param priorpar Vector describing the prior on delta consisting of 2 elements: mean of the prior, variance of the prior
+#'@param iter Number of iterations in the MCMC algorithm (samples drawn per chain)
+#'@param chains Number of chains in the MCMC algorithm
+#'@param burnin Number of burn-in samples in the MCMC algorithm
+#'@param alternative Direction of the test ("two.sided", "greater", "less") 
 
-# mydata <- c(20, 20, 11, 12, 1, 1)
-# param <- c(10, 2, 0.5)
-# priorpar <- c(0, 1)
+# Example vectors:
+# mydata <- c(n1, n2, m1, m2, v1, v2)
+# priorpar <- c(prior.mu, prior.var)
 
 mcmc_2sample_t <- function(mydata, priorpar, iter, burnin, chains, alternative){
   
@@ -63,8 +69,10 @@ mcmc_2sample_t <- function(mydata, priorpar, iter, burnin, chains, alternative){
 
 ########################### H0 sampling ########################################
 
-# nsamp: Number of samples drawn from posterior
-# x1, x2: data vectors with observations from both groups
+# Draw samples for sigma (and mu) in the independent-samples t-test 
+#'@param nsamp: Number of samples drawn from posterior
+#'@param x1: Data vector containing observations in group 1
+#'@param x2: Data vector containing observations in group 2
 
 drawH0_2sample_t <- function(nsamp, x1, x2){
   

@@ -1,3 +1,12 @@
+# ==============================================================================
+# Script to conduct design analyses for sequential design application (without
+# futility stopping) using the BFDA package
+# ==============================================================================
+
+# Simulations need several hours to run. Results can be found on https://osf.io/xaqh4/
+# To run the analysis script (sim_seq_Analyze.R), results need to
+# be saved in the R-project folder.
+
 library(BFDA)
 
 SIM_seqMaxN_00 <- BFDA.sim(expected.ES = 0, type = "t.between", 

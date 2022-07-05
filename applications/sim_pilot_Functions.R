@@ -1,5 +1,5 @@
 # ==============================================================================
-# Simulation: Internal pilot study
+# Internal pilot study: Function to create example and design analysis
 # ==============================================================================
 
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
@@ -8,6 +8,12 @@ source("ttest_2sample_normalprior/mcmc_2sample_t.R")
 #' @param n.pilot Sample size in the pilot study
 #' @param n.main Sample size in the main study (can be a vector of length >1)
 #' @param ES.pop Population effect size
+#' @param alternative Direction of alternative hypothesis ("two-sided", "greater", "less")
+#' @param prior.mu Mean of the prior distribution on delta
+#' @param prior.var Variance of the prior distribution on delta
+#' @param iter Number of Monte Carlo iterations for the forecast 
+#' @param forecastmodel Under which model should the forecast be computed? ("combined" = model-averaged, "H1" = alternative, "H0" = null)
+#' @param mcmc.setting List determining the settings of the MCMC sampling of posterior under H1 ($chains = number of chains, $iter = number of iterations in the MCMC algorithm, $burnin = number of burn-in samples)
 
 sim.pilot <- function(n.pilot, n.main, ES.pop, alternative = "two.sided", prior.mu=0, prior.var=1, iter = 1000, forecastmodel = "combined", mcmc.setting = list(chains=2, burnin=0, iter=5000)){
   
@@ -82,6 +88,20 @@ sim.pilot <- function(n.pilot, n.main, ES.pop, alternative = "two.sided", prior.
               prior.var=prior.var))
   
 }
+
+# Compute a design analysis for the internal pilot study application example,
+# i.e., re-run the simulation many times
+
+#' @param n.pilot Sample size in the pilot study
+#' @param n.main Sample size in the main study (can be a vector of length >1)
+#' @param ES.pop Population effect size
+#' @param alternative Direction of alternative hypothesis ("two-sided", "greater", "less")
+#' @param prior.mu Mean of the prior distribution on delta
+#' @param prior.var Variance of the prior distribution on delta
+#' @param iter Number of Monte Carlo iterations for the forecast 
+#' @param forecastmodel Under which model should the forecast be computed? ("combined" = model-averaged, "H1" = alternative, "H0" = null)
+#' @param iter.DA Number of Monte Carlo iterations for the design analysis
+#' @param mcmc.setting List determining the settings of the MCMC sampling of posterior under H1 ($chains = number of chains, $iter = number of iterations in the MCMC algorithm, $burnin = number of burn-in samples)
 
 designAnalysis.pilot <- function(n.pilot, n.main, ES.pop, alternative = "two.sided", prior.mu=0, prior.var=1, iter = 1000, forecastmodel = "combined", iter.DA = 1000, mcmc.setting = list(chains=2, burnin=0, iter=5000)){
   

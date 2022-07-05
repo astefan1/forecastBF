@@ -1,6 +1,12 @@
-# Design analysis of the futility stopping design with different effect sizes
+# ==============================================================================
+# Script to conduct design analyses for futility stopping application
+# ==============================================================================
 
-source("ttest_2sample_normalprior/mcmc_2sample_t.R")
+# Simulations need several hours to run. Results can be found on https://osf.io/xaqh4/
+# To run the analysis script (sim_stoppingFutility_Analyze.R), results need to
+# be saved in the R-project folder.
+
+source("ttest_2sample_normalprior/sim_stoppingFutility_Functions.R")
 
 SIM_stopfutil_00 <- designAnalysis.stopfutil(n.min = 10, 
                                              n.max = 100, 

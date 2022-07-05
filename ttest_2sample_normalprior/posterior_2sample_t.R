@@ -1,4 +1,14 @@
-# Posterior distribution for an independent-samples t-test with a normal prior
+# ==============================================================================
+# Posterior distribution for delta in an independent-samples t-test with a 
+# normal prior
+# ==============================================================================
+
+# Posterior distribution
+#' @param delta Parameter value of delta
+#' @param tval t-value in the data
+#' @param n1 Sample size group 1
+#' @param prior.mu Mean of the prior distribution on delta
+#' @param prior.var Variance of the prior distribution on delta
 
 posterior <- function(delta, tval, n1, n2, prior.mu, prior.var){
   df <- n1 + n2 - 2
@@ -11,7 +21,18 @@ posterior <- function(delta, tval, n1, n2, prior.mu, prior.var){
   dt(x = tval, df = df, ncp = sqrt(n_eff) * delta) * dnorm(x = delta, mean = prior.mu, sd = prior.sd) / ml1 
 }
 
-# Importance sampling from the posterior (t-test with normal prior; prior as proposal distribution)
+# Example
+# x <- seq(-2, 3, by=0.01)
+# # yval <- posterior(delta=x, tval=tval, n1=n1, n2=n2, prior.mu=prior.mu,  prior.var=prior.var)
+
+# Importance sampling from the posterior on delta (prior as proposal distribution)
+#' @param n.sample Number of samples drawn from he posterior
+#' @param tval t-value in the data
+#' @param n1 Sample size group 1
+#' @param prior.mu Mean of the prior distribution on delta
+#' @param prior.var Variance of the prior distribution on delta
+#' @param alternative Direction of alternative hypothesis ("two.sided", "greater", "less")
+
 sample_posterior <- function(n.sample, tval, n1, n2, prior.mu, prior.var, alternative = "two.sided"){
   
   df <- n1 + n2 - 2
@@ -32,6 +53,8 @@ sample_posterior <- function(n.sample, tval, n1, n2, prior.mu, prior.var, altern
   return(draws)
 }
 
+# Example
+
 # tval = 1
 # n1=20
 # n2=20
@@ -39,10 +62,4 @@ sample_posterior <- function(n.sample, tval, n1, n2, prior.mu, prior.var, altern
 # prior.var=1.5
 # 
 # samp  <- sample_posterior(n.sample = 10000, alternative="two.sided", tval=tval, n1=n1, n2=n2, prior.mu=prior.mu, prior.var=prior.var)
-# 
-# x <- seq(-2, 3, by=0.01)
-# # yval <- posterior(delta=x, tval=tval, n1=n1, n2=n2, prior.mu=prior.mu,  prior.var=prior.var)
-# yval <- posterior_normal_trunc(delta=x, a=-Inf, b=Inf, t=tval,n1=n1, n2=n2, independentSamples = TRUE,prior.mean=prior.mu,prior.variance = prior.var)
-# 
-# hist(samp, freq = FALSE, breaks=50)
-# points(x, yval, type="l")
+
