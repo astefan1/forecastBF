@@ -4,7 +4,7 @@
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
 source("ttest_2sample_normalprior/mcmc_2sample_t.R")
 
-layerplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, stepsize = NULL, showdensity = TRUE){
+layerplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, stepsize = NULL, showdensity = TRUE, ylim = NULL){
   
   # Choose Bayes factor that should be calculated depending on test direction
   BF <- switch(resultBFforecast$settings$alternative,
@@ -70,15 +70,19 @@ layerplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, st
   }
   
   # y axis limits
-  ylimvals <- c(min(log(BFs_s1),
-                    log(BFs_s2),
-                    -0.7*max(log(resultBFforecast$BFdist_stage_2)),
-                    log(1/10000)),
-                max(log(BFs_s1),
-                    log(BFs_s2),
-                    log(resultBFforecast$BFdist_stage_2),
-                    -0.7*min(log(resultBFforecast$BFdist_stage_2)),
-                    log(10000)))
+  if(is.null(ylim)){
+    ylimvals <- c(min(log(BFs_s1),
+                      log(BFs_s2),
+                      -0.7*max(log(resultBFforecast$BFdist_stage_2)),
+                      log(1/10000)),
+                  max(log(BFs_s1),
+                      log(BFs_s2),
+                      log(resultBFforecast$BFdist_stage_2),
+                      -0.7*min(log(resultBFforecast$BFdist_stage_2)),
+                      log(10000)))
+  } else {
+    ylimvals <- ylim
+  }
   
   # BF distribution: density, width
   scaleDens <- (pretty(c(0, n_total))[2] - pretty(c(0, n_total))[1]) * 0.5
@@ -173,14 +177,14 @@ layerplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, st
 
 }
 
-set.seed(111092)
-g1 <- rnorm(30)
-g2 <- rnorm(30)-0.5
-resultBFforecast1 <- BF.forecast(g1, g2, 50, forecastmodel = "H1", alternative="two.sided", prior.mu = 0, prior.var = 1)
-layerplot_BFforecast(resultBFforecast1, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
-resultBFforecast2 <- BF.forecast(g1, g2, 50, forecastmodel = "H0", alternative="two.sided", prior.mu = 0, prior.var = 1)
-layerplot_BFforecast(resultBFforecast2, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
-resultBFforecast3 <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="two.sided", prior.mu = 0, prior.var = 1)
-layerplot_BFforecast(resultBFforecast3, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
-
-
+# set.seed(111092)
+# g1 <- rnorm(30)
+# g2 <- rnorm(30)-0.5
+# resultBFforecast1 <- BF.forecast(g1, g2, 50, forecastmodel = "H1", alternative="two.sided", prior.mu = 0, prior.var = 1)
+# layerplot_BFforecast(resultBFforecast1, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
+# resultBFforecast2 <- BF.forecast(g1, g2, 50, forecastmodel = "H0", alternative="two.sided", prior.mu = 0, prior.var = 1)
+# layerplot_BFforecast(resultBFforecast2, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
+# resultBFforecast3 <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="two.sided", prior.mu = 0, prior.var = 1)
+# layerplot_BFforecast(resultBFforecast3, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
+# 
+# 

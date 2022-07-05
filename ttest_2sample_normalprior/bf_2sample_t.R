@@ -55,12 +55,20 @@ BFplus0_norm <- function(tval, n1, n2, prior.mu=0, prior.var=1){
   priorAreaLarger0 <- pnorm(0, mean=prior.mu, sd=prior.sd, lower.tail = FALSE)
   
   posterior <- function(delta){
-    dt(x = tval, df = df, ncp = sqrt(n_eff) * delta) * dnorm(x = delta, mean = prior.mu, sd = prior.sd) / ml1 
+    dt(x = tval, df = df, ncp = sqrt(n_eff) * delta) * dnorm(x = delta, mean = prior.mu, sd = prior.sd) / ml1  
   }
   
-  postAreaLarger0 <- 1-integrate(posterior, lower=-Inf, upper=0)$value
+  postAreaLarger0 <- tryCatch(1-integrate(posterior, lower=-Inf, upper=0)$value,
+                              error = function(e) {
+                                if(grepl("non-finite function value", e)){
+                                  return(NA)
+                                }
+                                })
   
-  return(postAreaLarger0 / priorAreaLarger0 * ml1 / ml0)
+  BF <- postAreaLarger0 / priorAreaLarger0 * ml1 / ml0
+  BF[is.na(BF)] <- ifelse(tval > 0, Inf, 0)
+  
+  return(BF)
 }
 
 BFplus0_norm <- Vectorize(BFplus0_norm, vectorize.args = "tval")
