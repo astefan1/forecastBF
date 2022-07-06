@@ -2,6 +2,13 @@
 # Stopping for futility: Stopping scenarios illustration
 # ==============================================================================
 
+# Function to draw a simple plot with predictions at any decision stage during 
+# the sequential sampling process
+
+#'@param SIM_stopfutil A result of the designAnalysis.stopfutil() function
+#'@param ID Which Monte Carlo iteration of the design analysis?
+#'@param stage What stage in the sequential sampling process
+
 simplefan <- function(SIM_stopfutil, ID = 1, stage = 1){
   
   SIM <- SIM_stopfutil[[1]][[ID]]
@@ -89,6 +96,8 @@ simplefan <- function(SIM_stopfutil, ID = 1, stage = 1){
   segments(x0 = 0, y0 = log(c(1/10, 10)), x1 = 101 + 2*scaleDens, lty = "dashed", xpd = NA)
   
 }
+
+# Plot the figures
 
 load("SIM_stopfutil_01.RData")
 simplefan(SIM_stopfutil_01, ID = 1, stage = 8) # Stop for futility

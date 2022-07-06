@@ -1,9 +1,18 @@
+# ==============================================================================
+# OLD PLOT (deprecated)
 # Fanplot to plot the development of the Bayes factor up to the current point
 # and the predictions if a sample of size N is added. Does not show noise in
 # the predictions and is therefore faster than the noisy fanplot where BFs
 # have to be calculated for all stages.
+# ==============================================================================
 
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
+
+# Function for plotting
+#' @param resultBFforecast Result object from BF.forecast()
+#' @param thresholds Lower and upper Bayes factor threshold defining strong evidence
+#' @param fancolor Defines the color of the fan; if left free defined by forecast model specified in resultBFforecast
+#' @param showdensity Should density be drawn on the right side of the graph? TRUE/FALSE
 
 fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, showdensity=TRUE){
   
@@ -109,10 +118,11 @@ fanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, show
     segments(x0 = 0, y0 = log(thresholds), x1 = n_total + ifelse(showdensity, 2*scaleDens, 0), lty = "dashed", xpd = NA)
 }
 
-fanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), showdensity = T)
-
-g1 <- rnorm(50)
-g2 <- rnorm(50) - 0.35
-resultBFforecast <- BF.forecast(g1, g2, 70, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1, iter = 1000)
-
+# Example
+# 
+# g1 <- rnorm(50)
+# g2 <- rnorm(50) - 0.35
+# resultBFforecast <- BF.forecast(g1, g2, 70, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1, iter = 1000)
+# 
+# fanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), showdensity = T)
 

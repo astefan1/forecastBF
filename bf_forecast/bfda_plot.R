@@ -1,3 +1,9 @@
+# ==============================================================================
+# Plot the result of a fixed-N Bayes factor design analysis
+# ==============================================================================
+
+rm(list = ls())
+
 library(ggplot2)
 source("ttest_2sample_normalprior/bfda_fixed_2sample_t.R")
 

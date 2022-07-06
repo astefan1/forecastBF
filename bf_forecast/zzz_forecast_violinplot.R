@@ -1,12 +1,16 @@
+# ==============================================================================
+# OLD PLOT (deprecated)
 # 2-part density plot showing BF distribution under H0 and H1. The width of the 
 # two distributions represents the posterior probability of H0 and H1 at the point of
 # the current sample.
+# ==============================================================================
 
-# source("ttest_2sample_normalprior/forecast_2sample_t.R")
-# g1 <- rnorm(10)
-# g2 <- rnorm(10) - 0
-# resultBFforecast <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1)
+source("ttest_2sample_normalprior/forecast_2sample_t.R")
 
+# Function for plotting
+#' @param resultBFforecast Result object from BF.forecast()
+#' @param thresholds Lower and upper Bayes factor threshold defining strong evidence
+#' @param distcolors Colors to fill the two density curves
 
 forecast_violinplot <- function(resultBFforecast, thresholds, distcolors=NULL){
   
@@ -107,4 +111,10 @@ forecast_violinplot <- function(resultBFforecast, thresholds, distcolors=NULL){
   
 }
 
-forecast_violinplot(resultBFforecast, thresholds = c(1/10, 10))
+# Example
+
+# g1 <- rnorm(10)
+# g2 <- rnorm(10) - 0
+# resultBFforecast <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1)
+
+# forecast_violinplot(resultBFforecast, thresholds = c(1/10, 10))

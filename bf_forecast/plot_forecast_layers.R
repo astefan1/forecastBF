@@ -1,13 +1,24 @@
-# Noisy fanplot with step size definition. The smaller the step size the longer
-# it takes to plot. To show some noise in the trajectories, the default setting 
-# works decently (roughly 5 steps if group n stage 2 >= 5). If stepsize >= group
-# n at stage 2, the plot is identical to the non-noisy plot (just takes slightly
-# longer).
+# ==============================================================================
+# Fan plots showing Bayes factor forecast
+# ==============================================================================
+
+# Fanplot using forecast layers instead of trajectories. Layers are based on 
+# quantiles of projected Bayes factors at any specific time point.
 
 source("ttest_2sample_normalprior/forecast_2sample_t.R")
 source("ttest_2sample_normalprior/mcmc_2sample_t.R")
 
-noisyfanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, stepsize = NULL, showdensity = TRUE){
+#################### Generic plotting function #################################
+
+# Function for plotting
+#' @param resultBFforecast Result object from BF.forecast()
+#' @param thresholds Lower and upper Bayes factor threshold defining strong evidence
+#' @param fancolor Defines the color of the fan; if left free defined by forecast model specified in resultBFforecast
+#' @param stepsize At what steps should forecast be evaluated; if left free, 10 equally-distanced steps are defined
+#' @param showdensity Should density be drawn on the right side of the graph? TRUE/FALSE
+#' @param ylim Defines lower and upper limit of the y-axis
+
+layerplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, stepsize = NULL, showdensity = TRUE, ylim = NULL){
   
   # Choose Bayes factor that should be calculated depending on test direction
   BF <- switch(resultBFforecast$settings$alternative,
@@ -28,7 +39,7 @@ noisyfanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL,
   
   # Get indices for updating steps
   if(is.null(stepsize)){
-    stepindx <- unique(round(seq(n_s1, n_total, length.out = 5)))
+    stepindx <- unique(round(seq(n_s1, n_total, length.out = 10)))
   } else {
     stepindx <- unique(c(round(seq(n_s1, n_total, by = stepsize)), n_total))
   }
@@ -60,25 +71,32 @@ noisyfanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL,
                                                                      prior.mu=resultBFforecast$settings$prior.mu, 
                                                                      prior.var=resultBFforecast$settings$prior.var)))
   
+  # Summarize BFs stage 2 by quantiles
+  
+  qnt_BFs_s2 <- apply(BFs_s2, 1, quantile, probs = c(0.05, seq(0.1, 0.9, 0.1), 0.95))
+  
   # Calculate necessary numbers for plot
   
   # Set fan color
   if(is.null(fancolor)){
-    fancolor <- c("#88CCEE", "#CC6677")
-  } else if(length(fancolor) == 1) {
-    fancolor <- rep(fancolor, 2)
+    fancolor <- ifelse(resultBFforecast$settings$forecastmodel == "H1", "#445BEE", 
+                       ifelse(resultBFforecast$settings$forecastmodel == "H0", "#CC6677", "grey12"))
   }
   
   # y axis limits
-  ylimvals <- c(min(log(BFs_s1),
-                    log(BFs_s2),
-                    -0.7*max(log(resultBFforecast$BFdist_stage_2)),
-                    log(thresholds)-1),
-                max(log(BFs_s1),
-                    log(BFs_s2),
-                    log(resultBFforecast$BFdist_stage_2),
-                    -0.7*min(log(resultBFforecast$BFdist_stage_2)),
-                    log(thresholds)+1))
+  if(is.null(ylim)){
+    ylimvals <- c(min(log(BFs_s1),
+                      log(BFs_s2),
+                      -0.7*max(log(resultBFforecast$BFdist_stage_2)),
+                      log(1/10000)),
+                  max(log(BFs_s1),
+                      log(BFs_s2),
+                      log(resultBFforecast$BFdist_stage_2),
+                      -0.7*min(log(resultBFforecast$BFdist_stage_2)),
+                      log(10000)))
+  } else {
+    ylimvals <- ylim
+  }
   
   # BF distribution: density, width
   scaleDens <- (pretty(c(0, n_total))[2] - pretty(c(0, n_total))[1]) * 0.5
@@ -98,7 +116,7 @@ noisyfanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL,
     betweenthresh <- round(100-abovethresh-belowthresh, 1)
     
     # x axis location of density labels
-    xtext <-  n_total + 0.5*scaleDens + max(BFforecastDens$estimate)/max(BFforecastDens$estimate) * scaleDens
+    xtext <-  n_total + 0.55*scaleDens + max(BFforecastDens$estimate)/max(BFforecastDens$estimate) * scaleDens
     
   }
   
@@ -117,40 +135,71 @@ noisyfanplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL,
   plot(x = 1:n_s1, y = c(log(c(1,BFs_s1))),
        type = "l", ylim = ylimvals, xlim = c(0, n_total), 
        xlab = "Sample size per group", bty="l", yaxt="n", ylab="", 
-       cex.lab = 1.5)
+       cex.lab = 2, cex.axis = 1.5)
+  
+  # Plot min-max
+  polygon(x = c(stepindx, rev(stepindx)), 
+          y = log(c(qnt_BFs_s2[1, ], rev(qnt_BFs_s2[11, ]))),
+          col = scales::alpha(fancolor, 0.1), border = NA)
+  
+  # Plot quantile 10-90
+  polygon(x = c(stepindx, rev(stepindx)), 
+          y = log(c(qnt_BFs_s2[2, ], rev(qnt_BFs_s2[10, ]))),
+          col = scales::alpha(fancolor, 0.1), border = NA)
+  
+  # Plot quantile 20-80
+  polygon(x = c(stepindx, rev(stepindx)), 
+          y = log(c(qnt_BFs_s2[3, ], rev(qnt_BFs_s2[9, ]))),
+          col = scales::alpha(fancolor, 0.1), border = NA)
+  
+  # Plot quantile 30-70
+  polygon(x = c(stepindx, rev(stepindx)), 
+          y = log(c(qnt_BFs_s2[4, ], rev(qnt_BFs_s2[8, ]))),
+          col = scales::alpha(fancolor, 0.1), border = NA)
+  
+  # Plot quantile 40-60
+  polygon(x = c(stepindx, rev(stepindx)), 
+          y = log(c(qnt_BFs_s2[5, ], rev(qnt_BFs_s2[7, ]))),
+          col = scales::alpha(fancolor, 0.1), border = NA)
+  
+  # Plot medians
+  points(x = stepindx, y = log(qnt_BFs_s2[6, ]), type = "l", col = fancolor, lwd = 1.5)
   
   # axis and label
-  axis(2, at=pretty(ylimvals), labels = format(exp(pretty(ylimvals)), 
-                                               digits=2, width=5), las = 1)
-  mtext("(Projected) Bayes factor", 2, line=5, cex=1.5)
-  
-  # trajectories for BF projection
-  for(i in 1:length(resultBFforecast$BFdist_stage_2)){
-    trajectorycolor <- ifelse(i <= nH1, fancolor[1], fancolor[2])
-    points(c(n_s1, stepindx), log(c(tail(BFs_s1, 1), BFs_s2[, i])), type="l", 
-           col = scales::alpha(trajectorycolor, 0.3))
-  }
+  axis(2, 
+       at=log(c(1/10000, 1/1000, 1/100, 1/10, 1, 10, 100, 1000, 10000)), 
+       labels = c("1/10000", "1/1000", "1/100", "1/10", "1", "10", "100", "1000", "10000"),
+       las = 1, cex.axis = 1.5)
+  mtext("Bayes factor", 2, line=5, cex=2)
   
   # density
   if(showdensity){
     polygon(x = c(rep(n_total + 0.5*scaleDens, length(BFforecastDens$eval.points)), 
                   n_total + 0.5*scaleDens + rev(BFforecastDens$estimate/max(BFforecastDens$estimate) * scaleDens)), 
             y = c(BFforecastDens$eval.points, rev(BFforecastDens$eval.points)), 
-            xpd = NA, col = "grey")
-    text(x = xtext, y = log(thresholds[2]) + 0.5 * scaleY, label = paste(abovethresh, "%"), xpd=NA, adj = c(0,0))
-    text(x = xtext, y = 0, label = paste(betweenthresh, "%"), xpd=NA, adj = c(0,0.5))
-    text(x = xtext, y = log(thresholds[1]) - 0.5 * scaleY, label = paste(belowthresh, "%"), xpd=NA, adj = c(0,1))
+            xpd = NA, col = scales::alpha(fancolor, 0.2))
+    text(x = xtext, y = log(thresholds[2]) + 0.5 * scaleY, label = paste(abovethresh, "%"), xpd=NA, adj = c(0,0), cex = 1.5)
+    text(x = xtext, y = 0, label = paste(betweenthresh, "%"), xpd=NA, adj = c(0,0.5), cex = 1.5)
+    text(x = xtext, y = log(thresholds[1]) - 0.5 * scaleY, label = paste(belowthresh, "%"), xpd=NA, adj = c(0,1), cex = 1.5)
     segments(x0 = n_total + 0.5*scaleDens, y0 = ylimvals[1], y1 = ylimvals[2], xpd=NA)
     
   }
   
   # thresholds for compelling evidence
   segments(x0 = 0, y0 = log(thresholds), x1 = n_total + ifelse(showdensity, 2*scaleDens, 0), lty = "dashed", xpd = NA)
-  
-  
+
 }
 
-# g1 <- rnorm(20)
-# g2 <- rnorm(20) - 0.1
-# resultBFforecast <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="greater", prior.mu = 0, prior.var = 1)
-# noisyfanplot_BFforecast(resultBFforecast = resultBFforecast, thresholds = c(1/10, 10), stepsize = 1, showdensity = T)
+####################### Plots depicted in the paper ############################
+
+set.seed(111092)
+g1 <- rnorm(30)
+g2 <- rnorm(30)-0.5
+resultBFforecast1 <- BF.forecast(g1, g2, 50, forecastmodel = "H1", alternative="two.sided", prior.mu = 0, prior.var = 1)
+layerplot_BFforecast(resultBFforecast1, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
+resultBFforecast2 <- BF.forecast(g1, g2, 50, forecastmodel = "H0", alternative="two.sided", prior.mu = 0, prior.var = 1)
+layerplot_BFforecast(resultBFforecast2, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
+resultBFforecast3 <- BF.forecast(g1, g2, 50, forecastmodel = "combined", alternative="two.sided", prior.mu = 0, prior.var = 1)
+layerplot_BFforecast(resultBFforecast3, thresholds=c(1/10, 10), fancolor=NULL, stepsize = NULL, showdensity = TRUE)
+
+
