@@ -148,9 +148,11 @@ for(i in 1:length(ES.pop)){
 }
 
 # Plot estimates for reporting everything
-par(mar=c(5,5,2,2))
+par(mar=c(5,5.5,2,2))
 plot(ES.pop, ES.noBias, pch = 19, bty="l", xlab = "Population Effect Size", 
-     ylab = "Meta-Analytic Estimate", cex.lab = 2, cex.axis = 1.5, cex=1.5, ylim = c(-0.2,1.1))
+     ylab = "", cex.lab = 2, cex.axis = 1.5, cex=1.5, 
+     ylim = c(-0.2,1.1), las=1)
+mtext("Meta-Analytic Estimate", 2, cex=2, line=3.5)
 
 abline(a=0, b=1, col = "grey")
 
