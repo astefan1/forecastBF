@@ -1,6 +1,6 @@
-# Continuous Research Design Evaluation Using Bayes Factor Forecasts
+# Interim Design Analysis Using Bayes Factor Forecasts
 
-Repository containing code for the paper "Continuous Research Design Evaluation Using Bayes Factor Forecasts" by Angelika Stefan and Eric-Jan Wagenmakers.
+Repository containing code for the paper "Interim Design Analysis Using Bayes Factor Forecasts" by Angelika Stefan, Quentin Gronau, and Eric-Jan Wagenmakers.
 
 ## Code Structure
 
@@ -21,7 +21,7 @@ This folder contains all necessary code to conduct a Bayes factor forecast for a
 
 :file_folder: __bf_forecast__
 
-This folder contains all necessary code to reproduce the results and plots in the first section of the manuscript (introduction of continuous research design evaluation using Bayes factor forecasts).
+This folder contains all necessary code to reproduce the results and plots in the first section of the manuscript (introduction of interim BFDA).
 
 * __bfda_plot.R__ contains the code to reproduce the visualization of the outcome of a fixed-N BFDA (density plot of Bayes factor distribution)
 * __plot_forecast_layers.R__ contains the code to reproduce the visualization of the Bayes factor forecast (model-averaged and model-specific; fan-plot design)
