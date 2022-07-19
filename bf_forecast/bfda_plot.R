@@ -8,12 +8,15 @@ library(ggplot2)
 source("ttest_2sample_normalprior/bfda_fixed_2sample_t.R")
 
 set.seed(42)
-bfda1 <- BFDA_2sample_t(0.5, alternative="two.sided", group.n = 50, prior.mu = 0, prior.var = 0.5, iter = 100000)
+bfda1 <- BFDA_2sample_t(0.5, alternative="two.sided", group.n = 50, prior.mu = 0, prior.var = 1, iter = 100000)
 
 dat <- data.frame(bfda1)
 dat$logBF <- log(dat$BF)
 
 credInt <- unname(quantile(dat$logBF, probs = c(0.05, 0.95)))
+exp(credInt)
+sum(dat$logBF > log(10))/length(dat$logBF) 
+
 densBF <- density(dat$logBF)
 
 plot(densBF$x, densBF$y, type="l", bty="n",  yaxt="n", xaxt="n", xlab="", ylab="", xlim = log(c(1/100, 10000)))

@@ -3,6 +3,7 @@
 # ==============================================================================
 
 rm(list = ls())
+library(ggplot2)
 
 ################## Model-averaged predictions, zero-centered prior #############
 
@@ -283,7 +284,7 @@ SIM_numbers <- gsub("SIM_pilot_", "", SIM_names)
 SIM_numbers <- substr(SIM_numbers, 1, nchar(SIM_numbers)-6)
 
 # Change the following parameters for different thresholds and desired power
-boundary <- c(1/10,10)
+boundary <- c(1/6,6)
 power <- 0.6
 
 simresults <- as.data.frame(matrix(NA, ncol=7, nrow=0))
@@ -324,7 +325,7 @@ colnames(meta2) <- c("Estimate", "CI_low", "CI_high", "N_Studies")
 
 # Plot estimates for reporting everything
 plot(ES.pop, meta$Estimate, pch = 19, bty="l", xlab = "Population Effect Size", 
-     ylab = "Meta-Analytic Estimate", cex.lab = 1.5, cex.axis = 1.5, cex=1.5, ylim = c(-0.2,1.1))
+     ylab = "Meta-Analytic Estimate", cex.lab = 1.5, cex.axis = 1.5, cex=1.5, ylim = c(-0.2,1.1), las=1)
 abline(a=0, b=1, col = "grey")
 
 # Add estimates for selective reporting
