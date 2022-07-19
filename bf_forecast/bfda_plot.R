@@ -13,7 +13,7 @@ bfda1 <- BFDA_2sample_t(0.5, alternative="two.sided", group.n = 50, prior.mu = 0
 dat <- data.frame(bfda1)
 dat$logBF <- log(dat$BF)
 
-credInt <- unname(quantile(dat$logBF, probs = c(0.05, 0.95)))
+credInt <- unname(quantile(dat$logBF, probs = c(0.025, 0.975)))
 exp(credInt)
 sum(dat$logBF > log(10))/length(dat$logBF) 
 
