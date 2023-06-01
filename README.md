@@ -43,6 +43,7 @@ Scripts should be executed according to the following order of postfixes: `Funct
 * __sim_pilot_Plots.R__ contains code to reproduce all plots in the manuscript section covering the Bayesian internal pilot study design (as well as in the appendix).
 * __bfda_power.R__ reproduces the plot explaining the large proportion of early stopping in the Bayesian internal pilot study design using the results of fixed-N BFDAs.
 * __zzz_sim_pilot_Plots_Scenarios.R__ contains code to make a plot similar to `sim_stoppingFutility_Plot-StoppingScenarios.R` that was not included in the manuscript
+* __zzz_sim_pilot_pointEstimates.R__ contains code that bases the continuation decisions in pilot studies on point estimates. Not included in the manuscript.
 
 *Futility Stopping in Sequential Bayesian Desings* 
 
@@ -51,11 +52,20 @@ Scripts should be executed according to the following order of postfixes: `Funct
 * __sim_stoppingFutility_Analyze.R__ reproduces the stacked barplot figures presented in the manuscript
 * __sim_stoppingFutility_Plot-StoppingScenarios.R__ reproduces the panels in the figure depicting the stopping scenarios in the manuscript
 * __tryout_sim_stoppingFutility_HighFutility.R__ contains an exploratory analysis where the futility stopping threshold is increased. Analysis was conducted mainly as a validity check for the results of `sim_stoppingFutility_Analyze.R`.
+* __sim_stoppingFutility_AppendixRun.R__ contains script to run additional simulations of the futility stopping design presented in the online appendix
 
 *Bayesian Sequential Max-N Design (no futility stopping)*
 * __sim_seq_Run.R__ contains a script to run the design analyses for the Bayesian sequential Max-N design based on the [`BFDA` R-package](https://github.com/nicebread/BFDA)
 * __sim_seq_Analyze.R__ contains a script to reproduce the stacked barplot figure presented in the manuscript for the sequential max-N design
 * __sim_both_Analyze.R__ reproduces the comparison of expected sample sizes for the futility stopping and the regular sequential Max-N design
+
+:file_folder: __appendix__
+
+Scripts to reproduce the plots in the online appendix. The simulation results themselves can be reproduced using the script __sim_stoppingFutility_AppendixRun.R__ in the "applications" folder.
+
+* __sim_stoppingFutility_differentPrior_plot.R__ Contains plotting functions for the simulation condition with the informed prior
+* __sim_stoppingFutility_highthreshold_plot.R__ Contains plotting functions for the simulation condition with the higher futility threshold
+* __sim_stoppingFutility_smallN_plot.R__ Contains plotting functions for the simulation condition with smaller max-N
 
 ## General Remarks
 
@@ -69,12 +79,12 @@ Scripts should be executed according to the following order of postfixes: `Funct
 
 ```
 > sessionInfo()
-R version 4.0.2 (2020-06-22)
+R version 4.2.1 (2022-06-23)
 Platform: x86_64-apple-darwin17.0 (64-bit)
-Running under: macOS  10.16
+Running under: macOS Big Sur 11.6.8
 
 Matrix products: default
-LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -83,23 +93,22 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] dplyr_1.0.4   ggplot2_3.3.3
+[1] ggpattern_1.0.1 ggplot2_3.4.2  
 
 loaded via a namespace (and not attached):
- [1] mclust_5.4.6         Rcpp_1.0.6           mvtnorm_1.1-1        lattice_0.20-41      prettyunits_1.1.1   
- [6] ps_1.5.0             digest_0.6.27        assertthat_0.2.1     packrat_0.5.0        V8_3.4.0            
-[11] plyr_1.8.6           R6_2.5.0             stats4_4.0.2         evaluate_0.14        coda_0.19-4         
-[16] pillar_1.4.7         rlang_0.4.10         pscl_1.5.5           curl_4.3             callr_3.5.1         
-[21] Matrix_1.2-18        rmarkdown_2.6        labeling_0.4.2       stringr_1.4.0        loo_2.4.1           
-[26] munsell_0.5.0        xfun_0.20            compiler_4.0.2       rstan_2.21.3         pkgconfig_2.0.3     
-[31] pkgbuild_1.2.0       htmltools_0.5.1.1    pBrackets_1.0        rstantools_2.1.1     tidyselect_1.1.0    
-[36] tibble_3.0.6         gridExtra_2.3        codetools_0.2-16     matrixStats_0.58.0   crayon_1.4.1        
-[41] withr_2.4.1          MASS_7.3-51.6        grid_4.0.2           nlme_3.1-148         jsonlite_1.7.2      
-[46] gtable_0.3.0         lifecycle_1.0.0      DBI_1.1.1            magrittr_2.0.1       metafor_2.4-0       
-[51] StanHeaders_2.21.0-7 scales_1.1.1         RcppParallel_5.0.2   KernSmooth_2.23-17   cli_3.2.0           
-[56] stringi_1.5.3        reshape2_1.4.4       farver_2.0.3         LaplacesDemon_16.1.4 metaBMA_0.6.6       
-[61] ellipsis_0.3.1       generics_0.1.0       vctrs_0.3.6          tools_4.0.2          logspline_2.1.16    
-[66] glue_1.6.2           purrr_0.3.4          ks_1.12.0            rsconnect_0.8.16     processx_3.4.5      
-[71] parallel_4.0.2       inline_0.3.17        colorspace_2.0-0     bridgesampling_1.0-0 knitr_1.31          
-[76] Brobdingnag_1.2-6   
+ [1] Rcpp_1.0.9           lattice_0.20-45      prettyunits_1.1.1    png_0.1-8            class_7.3-20        
+ [6] ps_1.7.1             utf8_1.2.2           V8_4.2.1             plyr_1.8.7           R6_2.5.1            
+[11] stats4_4.2.1         e1071_1.7-13         pillar_1.8.1         rlang_1.1.1          curl_4.3.2          
+[16] pscl_1.5.5           rstudioapi_0.14      callr_3.7.2          magick_2.7.4         Matrix_1.5-1        
+[21] labeling_0.4.2       stringr_1.4.1        loo_2.5.1            munsell_0.5.0        proxy_0.4-27        
+[26] compiler_4.2.1       gridpattern_1.0.2    rstan_2.26.13        pkgconfig_2.0.3      pkgbuild_1.3.1      
+[31] tidyselect_1.1.2     tibble_3.1.8         gridExtra_2.3        codetools_0.2-18     matrixStats_0.62.0  
+[36] fansi_1.0.3          viridisLite_0.4.1    crayon_1.5.2         dplyr_1.0.10         withr_2.5.0         
+[41] sf_1.0-13            MASS_7.3-57          grid_4.2.1           jsonlite_1.8.2       gtable_0.3.1        
+[46] lifecycle_1.0.3      DBI_1.1.3            magrittr_2.0.3       units_0.8-2          StanHeaders_2.26.13 
+[51] scales_1.2.1         RcppParallel_5.1.5   KernSmooth_2.23-20   stringi_1.7.8        cli_3.4.1           
+[56] cachem_1.0.6         reshape2_1.4.4       farver_2.1.1         LaplacesDemon_16.1.6 generics_0.1.3      
+[61] vctrs_0.6.2          tools_4.2.1          glue_1.6.2           purrr_0.3.5          processx_3.7.0      
+[66] parallel_4.2.1       fastmap_1.1.0        inline_0.3.19        colorspace_2.0-3     classInt_0.4-9      
+[71] memoise_2.0.1   
 ```
