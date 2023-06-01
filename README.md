@@ -6,7 +6,7 @@ Repository containing code for the paper "Interim Design Analysis Using Bayes Fa
 
 The code is organized in an R project. The project is organized as follows:
 
-The code is separated in three main folders:
+The code is separated in four main folders:
 
 
 :file_folder: __ttest_2sample_normalprior__
