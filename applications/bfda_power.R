@@ -39,13 +39,14 @@ library(reshape2)
 powerDat <- reshape2::melt(as.data.frame(power))
 powerDat$groupN <- rep(groupN, length(ES))
 
-ggplot(data = powerDat, aes(x=variable, y = groupN, fill=value>0.8)) +
+ggplot(data = powerDat, aes(x=variable, y = groupN, fill=value>0.6)) +
   geom_tile(color="black") +
   theme_minimal() +
   labs(x = "Effect Size",
        y = "Sample Size",
-       fill = "Power > 0.8") +
-  theme(text = element_text(size = 18))
+       fill = "Power > 0.6") +
+  theme(text = element_text(size = 18)) +
+  scale_fill_manual(values = c("#C25120", "#03B9AA"))
 
 # Now with informed prior
 
@@ -80,6 +81,7 @@ ggplot(data = powerDat, aes(x=variable, y = groupN, fill=value>0.8)) +
   labs(x = "Effect Size",
        y = "Sample Size",
        fill = "Power > 0.8") +
-  theme(text = element_text(size = 18))
+  theme(text = element_text(size = 18)) +
+  scale_fill_manual(values = c("#C25120", "#03B9AA"))
 
   

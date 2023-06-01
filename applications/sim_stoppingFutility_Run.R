@@ -6,7 +6,7 @@
 # To run the analysis script (sim_stoppingFutility_Analyze.R), results need to
 # be saved in the R-project folder.
 
-source("ttest_2sample_normalprior/sim_stoppingFutility_Functions.R")
+source("applications/sim_stoppingFutility_Functions.R")
 
 SIM_stopfutil_00 <- designAnalysis.stopfutil(n.min = 10, 
                                              n.max = 100, 

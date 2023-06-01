@@ -4,6 +4,8 @@
 
 rm(list = ls())
 library(ggplot2)
+library(ggpattern)
+library(magick)
 
 ################## Model-averaged predictions, zero-centered prior #############
 
@@ -15,7 +17,7 @@ lapply(SIM_names, load, .GlobalEnv)
 SIM_numbers <- gsub("SIM_pilot_", "", SIM_names)
 SIM_numbers <- substr(SIM_numbers, 1, nchar(SIM_numbers)-6)
 
-boundary <- c(1/6,6)
+boundary <- c(1/10,10)
 power <- 0.8
 
 simresults <- as.data.frame(matrix(NA, ncol=7, nrow=0))
@@ -41,19 +43,63 @@ countsDF$ES.pop <- as.numeric(rep(levels(simresults$ES.pop), each = length(level
 countsDF$SSconclusiveFinal <- as.numeric(rep(levels(simresults$SSconclusiveFinal), times =length(levels(simresults$ES.pop))))
 countsDF$counts <- as.vector(countsMatrix)*sign(countsDF$SSconclusiveFinal)
 countsDF$ES.pop <- as.factor(countsDF$ES.pop)
-countsDF$SSconclusiveFinal <- factor(countsDF$SSconclusiveFinal, levels = c("-200", "-150", "-100", "-50", "-20", "20", "50", "100", "150", "200"))
+countsDF$SSconclusiveFinal <- factor(countsDF$SSconclusiveFinal, levels = c("-200", "-150", "-100", "-50", "-20", "20", "50", "100", "150", "200"), ordered = TRUE)
 
-ggplot(countsDF, aes(fill = SSconclusiveFinal, x = ES.pop, y = counts/10)) +
-  geom_bar(position = "stack", stat = "identity", size=0.1, color="black") +
-  scale_fill_manual(values = c("#A61620", "#F76E5E", "#FFAC72", "#F3D06E", "#F6EA89", "#BEFFFF", "#A0E8EE", "#3FA0FF","#264FFF", "#292ADA"),
-                    labels = c("N=200 inconclusive", "N=150       |", "N=100       |", "N=50         |", "N=20         |\n", "\nN=20 conclusive", "N=50         |", "N=100       |", "N=150       |", "N=200       |"),
-                    drop = FALSE) +
+pat <- c(rep("right45", 5), rep("left30", 5))
+mycolors <- c("#BEFFFF", "#A0E8EE", "#3FA0FF","#264FFF", "#292ADA","#F6EA89", "#F3D06E", "#FFAC72", "#F76E5E",  "#A61620")
+
+theme_set(theme_classic())
+update_geom_defaults("text", list(colour = "grey20", family = theme_get()$text$family, size = theme_get()$text$size))
+
+p <- ggplot(countsDF, aes(x = ES.pop, y = counts/10)) +
+  geom_bar_pattern(aes(pattern_type = SSconclusiveFinal, fill = SSconclusiveFinal), pattern = "magick", position = "stack", stat = "identity", size=0.1, pattern_key_scale_factor = 0.7,
+                   colour = 'black', show.legend = FALSE) +
+  scale_fill_manual(values = mycolors,
+                    labels = c("N=20 conclusive", "N=50         |", "N=100       |", "N=150       |", "N=200       |", "N=20 inconclusive", "N=50         |", "N=100       |", "N=150       |", "N=200       |"),
+                    drop = FALSE,
+                    breaks = c( "20", "50", "100", "150", "200","-20", "-50", "-100","-150", "-200")
+  ) +
+  scale_pattern_type_manual(values = pat,
+                    labels = c("N=20 conclusive", "N=50         |", "N=100       |", "N=150       |", "N=200       |", "N=20 inconclusive", "N=50         |", "N=100       |", "N=150       |", "N=200       |"),
+                    drop = FALSE,
+                    breaks = c( "20", "50", "100", "150", "200","-20", "-50", "-100","-150", "-200"),
+  ) +
   theme_classic() +
+  annotate("segment", x=0, y=-100, xend=0, yend=100,
+           arrow=arrow(length=unit(0.3, "cm"), ends = "both")) +
   theme(legend.title = element_blank(),
-        text = element_text(size = 18)) +
+        text = element_text(size = 18),
+        axis.line.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_text(margin = margin(r =25)),
+        ) +
   labs(x = "Population Effect Size",
-       y = "% Ending At") +
-  scale_y_continuous(limits = c(-100, 100), labels = c("100", "50", "0", "50", "100"))
+       y = "") +
+  scale_y_continuous(limits = c(-100, 100), labels = c("100", "50", "0", "50", "100")) +
+  scale_x_discrete(expand = c(-0.5, 1)) +
+  coord_cartesian(clip = "off") 
+
+p <- p +
+  geom_text(aes(label = label), data.frame(label="% conclusive BF"), x = -1.3, y = 50, angle = 90, adj = 0.5, size = 7) +
+  geom_text(aes(label = label), data.frame(label="% inconclusive BF"), x = -1.3, y = -50, angle = 90, adj = 0.5, size = 7) +
+  annotate("segment", x = -0.1, y = 0, xend = 0.1, yend = 0)
+  
+p
+
+# Produce the color bars as a legend because patterned legend doesn't work
+
+ES.pop <- rep(seq(0, 1, by = 0.1), each=10)
+SSconclusiveFinal <- rep(c(-200, -150, -100, -50, -20, 20, 50, 100, 150, 200), 11)
+counts <- rep(1, 110)
+countsDF2 <- data.frame(ES.pop = ES.pop,
+                        SSconclusiveFinal = as.factor(SSconclusiveFinal),
+                        counts=counts)
+ggplot(countsDF2, aes(x = ES.pop, y = counts/10)) +
+  geom_bar_pattern(aes(pattern_type = SSconclusiveFinal, fill = SSconclusiveFinal), pattern = "magick", position = "stack", stat = "identity", size=0.1, pattern_key_scale_factor = 0.7,
+                   colour = 'black') +
+  scale_fill_manual(values = mycolors) +
+  scale_pattern_type_manual(values = pat) +
+  theme_classic() 
 
 
 ################ Predictions under H1, zero-centered prior (Appendix) ##########
