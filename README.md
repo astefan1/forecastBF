@@ -43,7 +43,8 @@ Scripts should be executed according to the following order of postfixes: `Funct
 * __sim_pilot_Plots.R__ contains code to reproduce all plots in the manuscript section covering the Bayesian internal pilot study design (as well as in the appendix).
 * __bfda_power.R__ reproduces the plot explaining the large proportion of early stopping in the Bayesian internal pilot study design using the results of fixed-N BFDAs.
 * __zzz_sim_pilot_Plots_Scenarios.R__ contains code to make a plot similar to `sim_stoppingFutility_Plot-StoppingScenarios.R` that was not included in the manuscript
-* __zzz_sim_pilot_pointEstimates.R__ contains code that bases the continuation decisions in pilot studies on point estimates. Not included in the manuscript.
+* __zzz_sim_pilot_pointEstimates_Functions.R__ contains functions that base the continuation decisions in pilot studies on point estimates. Not included in the manuscript.
+* __zzz_sim_pilot_pointEstimates_Run.R__ contains a script to run the design analyses for the Bayesian internal pilot study design based on point estimates. Not included in the manuscript.
 
 *Futility Stopping in Sequential Bayesian Desings* 
 
