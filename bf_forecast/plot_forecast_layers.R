@@ -102,10 +102,6 @@ layerplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, st
   scaleDens <- (pretty(c(0, n_total))[2] - pretty(c(0, n_total))[1]) * 0.5
   
   if(showdensity){
-    BFforecastDens <- ks::kde.boundary(log(resultBFforecast$BFdist_stage_2), 
-                                       xmin = min(log(resultBFforecast$BFdist_stage_2), -0.3 * max(log(resultBFforecast$BFdist_stage_2))), 
-                                       xmax = max(log(resultBFforecast$BFdist_stage_2), -0.3 * min(log(resultBFforecast$BFdist_stage_2))), 
-                                       h = ks::hpi(x = log(resultBFforecast$BFdist_stage_2)) * 2)
     
     # distance between two points on y axis
     scaleY <- pretty(ylimvals)[2]-pretty(ylimvals)[1]
@@ -114,6 +110,13 @@ layerplot_BFforecast <- function(resultBFforecast, thresholds, fancolor=NULL, st
     abovethresh <- round(sum(resultBFforecast$BFdist_stage_2 >= thresholds[2]) / length(resultBFforecast$BFdist_stage_2) * 100, 1)
     belowthresh <- round(sum(resultBFforecast$BFdist_stage_2 <= thresholds[1]) / length(resultBFforecast$BFdist_stage_2) * 100, 1)
     betweenthresh <- round(100-abovethresh-belowthresh, 1)
+    
+    # kernel density calculation
+    
+    BFforecastDens <- ks::kde.boundary(log(resultBFforecast$BFdist_stage_2), 
+                                       xmin = min(log(resultBFforecast$BFdist_stage_2)), 
+                                       xmax = max(log(resultBFforecast$BFdist_stage_2)), 
+                                       h = ks::hpi(x = log(resultBFforecast$BFdist_stage_2)) * 2)
     
     # x axis location of density labels
     xtext <-  n_total + 0.55*scaleDens + max(BFforecastDens$estimate)/max(BFforecastDens$estimate) * scaleDens
